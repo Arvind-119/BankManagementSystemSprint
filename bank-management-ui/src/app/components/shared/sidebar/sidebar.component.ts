@@ -60,11 +60,6 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
           <span class="nav-text">Accounts</span>
         </a>
 
-        <a routerLink="/accounts/operations" routerLinkActive="active" id="nav-operations" class="nav-item">
-          <span class="nav-icon">💰</span>
-          <span class="nav-text">Banking Ops</span>
-        </a>
-
         <a routerLink="/transactions" routerLinkActive="active" id="nav-transactions" class="nav-item">
           <span class="nav-icon">💳</span>
           <span class="nav-text">Transactions</span>

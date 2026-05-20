@@ -114,10 +114,6 @@ import { SessionUser } from '../../models/auth.model';
               <span class="action-icon">🏦</span>
               <span>Create Account</span>
             </a>
-            <a routerLink="/accounts/operations" class="action-btn" id="action-operations">
-              <span class="action-icon">💰</span>
-              <span>Banking Ops</span>
-            </a>
             <a routerLink="/transactions" class="action-btn" id="action-view-txn">
               <span class="action-icon">💳</span>
               <span>View Txns</span>
