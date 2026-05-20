@@ -1,0 +1,259 @@
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
+import { CustomerService } from '../../services/customer.service';
+import { EmployeeService } from '../../services/employee.service';
+import { AccountService } from '../../services/account.service';
+import { TransactionService } from '../../services/transaction.service';
+import { Transaction } from '../../models/transaction.model';
+
+@Component({
+  selector: 'app-dashboard',
+  standalone: true,
+  imports: [CommonModule, RouterModule],
+  template: `
+    <div class="dashboard">
+      <div class="dashboard-header">
+        <h2>Dashboard Overview</h2>
+        <p>Welcome back, Bank Manager</p>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card customers-card" id="stat-customers">
+          <div class="stat-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </div>
+          <div class="stat-info">
+            <h3>{{ customerCount }}</h3>
+            <span>Total Customers</span>
+          </div>
+        </div>
+
+        <div class="stat-card employees-card" id="stat-employees">
+          <div class="stat-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+          </div>
+          <div class="stat-info">
+            <h3>{{ employeeCount }}</h3>
+            <span>Total Employees</span>
+          </div>
+        </div>
+
+        <div class="stat-card accounts-card" id="stat-accounts">
+          <div class="stat-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+          </div>
+          <div class="stat-info">
+            <h3>{{ accountCount }}</h3>
+            <span>Total Accounts</span>
+          </div>
+        </div>
+
+        <div class="stat-card transactions-card" id="stat-transactions">
+          <div class="stat-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+          </div>
+          <div class="stat-info">
+            <h3>{{ transactionCount }}</h3>
+            <span>Total Transactions</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="dashboard-content">
+        <div class="recent-section glass-card">
+          <div class="section-header">
+            <h3>Recent Transactions</h3>
+            <a routerLink="/transactions" class="view-all">View All →</a>
+          </div>
+          <div class="table-container">
+            <table *ngIf="recentTransactions.length > 0">
+              <thead>
+                <tr>
+                  <th>Transaction ID</th>
+                  <th>Account</th>
+                  <th>Type</th>
+                  <th>Amount</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let t of recentTransactions">
+                  <td class="txn-id">{{ t.transactionId | slice:0:12 }}...</td>
+                  <td>{{ t.accountNo }}</td>
+                  <td>
+                    <span class="badge" [ngClass]="{
+                      'badge-deposit': t.transactionType === 'DEPOSIT',
+                      'badge-withdrawal': t.transactionType === 'WITHDRAWAL',
+                      'badge-transfer': t.transactionType === 'TRANSFER'
+                    }">{{ t.transactionType }}</span>
+                  </td>
+                  <td class="amount" [ngClass]="{
+                    'amount-credit': t.transactionType === 'DEPOSIT',
+                    'amount-debit': t.transactionType === 'WITHDRAWAL'
+                  }">₹{{ t.amount | number:'1.2-2' }}</td>
+                  <td><span class="status-badge status-{{ t.status?.toLowerCase() }}">{{ t.status }}</span></td>
+                </tr>
+              </tbody>
+            </table>
+            <div *ngIf="recentTransactions.length === 0" class="empty-state">
+              <p>No transactions yet. Start by creating accounts and making deposits.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="quick-actions glass-card">
+          <h3>Quick Actions</h3>
+          <div class="actions-grid">
+            <a routerLink="/customers/new" class="action-btn" id="action-add-customer">
+              <span class="action-icon">👤</span>
+              <span>Add Customer</span>
+            </a>
+            <a routerLink="/employees/new" class="action-btn" id="action-add-employee">
+              <span class="action-icon">👨‍💼</span>
+              <span>Add Employee</span>
+            </a>
+            <a routerLink="/accounts/new" class="action-btn" id="action-create-account">
+              <span class="action-icon">🏦</span>
+              <span>Create Account</span>
+            </a>
+            <a routerLink="/accounts/operations" class="action-btn" id="action-operations">
+              <span class="action-icon">💰</span>
+              <span>Banking Ops</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  `,
+  styles: [`
+    .dashboard { animation: fadeIn 0.4s ease; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    .dashboard-header { margin-bottom: 32px; }
+    .dashboard-header h2 { font-size: 1.8rem; font-weight: 700; color: #fff; margin: 0 0 4px 0; }
+    .dashboard-header p { color: rgba(255,255,255,0.5); font-size: 0.9rem; margin: 0; }
+
+    .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 32px; }
+
+    .stat-card {
+      background: rgba(255,255,255,0.05);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 16px;
+      padding: 24px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      transition: all 0.3s ease;
+    }
+    .stat-card:hover { transform: translateY(-4px); box-shadow: 0 8px 30px rgba(0,0,0,0.3); }
+
+    .stat-icon {
+      width: 52px; height: 52px;
+      border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      color: white;
+    }
+    .customers-card .stat-icon { background: linear-gradient(135deg, #667eea, #764ba2); }
+    .employees-card .stat-icon { background: linear-gradient(135deg, #00d2ff, #3a7bd5); }
+    .accounts-card .stat-icon { background: linear-gradient(135deg, #f7971e, #ffd200); }
+    .transactions-card .stat-icon { background: linear-gradient(135deg, #11998e, #38ef7d); }
+
+    .stat-info h3 { font-size: 1.8rem; font-weight: 700; color: #fff; margin: 0; }
+    .stat-info span { font-size: 0.8rem; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 0.5px; }
+
+    .dashboard-content { display: grid; grid-template-columns: 2fr 1fr; gap: 24px; }
+
+    .glass-card {
+      background: rgba(255,255,255,0.05);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 16px;
+      padding: 24px;
+    }
+
+    .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .section-header h3 { font-size: 1.1rem; font-weight: 600; color: #fff; margin: 0; }
+    .view-all { color: #667eea; font-size: 0.85rem; text-decoration: none; transition: color 0.3s; }
+    .view-all:hover { color: #764ba2; }
+
+    table { width: 100%; border-collapse: collapse; }
+    th { text-align: left; font-size: 0.75rem; font-weight: 600; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.5px; padding: 12px 16px; border-bottom: 1px solid rgba(255,255,255,0.08); }
+    td { padding: 14px 16px; font-size: 0.85rem; color: rgba(255,255,255,0.8); border-bottom: 1px solid rgba(255,255,255,0.05); }
+    tr:hover td { background: rgba(255,255,255,0.03); }
+    .txn-id { font-family: 'Courier New', monospace; font-size: 0.8rem; color: rgba(255,255,255,0.5); }
+
+    .badge { padding: 4px 10px; border-radius: 6px; font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+    .badge-deposit { background: rgba(17,153,142,0.2); color: #38ef7d; }
+    .badge-withdrawal { background: rgba(255,65,108,0.2); color: #ff416c; }
+    .badge-transfer { background: rgba(102,126,234,0.2); color: #667eea; }
+
+    .amount-credit { color: #38ef7d; }
+    .amount-debit { color: #ff416c; }
+
+    .status-badge { padding: 4px 8px; border-radius: 6px; font-size: 0.7rem; font-weight: 600; }
+    .status-success { background: rgba(56,239,125,0.15); color: #38ef7d; }
+    .status-failed { background: rgba(255,65,108,0.15); color: #ff416c; }
+    .status-pending { background: rgba(247,151,30,0.15); color: #ffd200; }
+
+    .empty-state { padding: 40px; text-align: center; }
+    .empty-state p { color: rgba(255,255,255,0.4); font-size: 0.9rem; }
+
+    .quick-actions h3 { font-size: 1.1rem; font-weight: 600; color: #fff; margin: 0 0 20px 0; }
+    .actions-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .action-btn {
+      display: flex; flex-direction: column; align-items: center; gap: 8px;
+      padding: 20px 12px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 12px;
+      color: rgba(255,255,255,0.8);
+      text-decoration: none;
+      font-size: 0.8rem;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+    .action-btn:hover { background: rgba(102,126,234,0.15); border-color: rgba(102,126,234,0.3); transform: translateY(-2px); }
+    .action-icon { font-size: 1.5rem; }
+
+    @media (max-width: 1200px) { .stats-grid { grid-template-columns: repeat(2, 1fr); } .dashboard-content { grid-template-columns: 1fr; } }
+    @media (max-width: 768px) { .stats-grid { grid-template-columns: 1fr; } }
+  `]
+})
+export class DashboardComponent implements OnInit {
+  customerCount = 0;
+  employeeCount = 0;
+  accountCount = 0;
+  transactionCount = 0;
+  recentTransactions: Transaction[] = [];
+
+  constructor(
+    private customerService: CustomerService,
+    private employeeService: EmployeeService,
+    private accountService: AccountService,
+    private transactionService: TransactionService
+  ) {}
+
+  ngOnInit(): void {
+    this.customerService.getAll().subscribe({
+      next: (data) => this.customerCount = data.length,
+      error: () => this.customerCount = 0
+    });
+    this.employeeService.getAll().subscribe({
+      next: (data) => this.employeeCount = data.length,
+      error: () => this.employeeCount = 0
+    });
+    this.accountService.getAll().subscribe({
+      next: (data) => this.accountCount = data.length,
+      error: () => this.accountCount = 0
+    });
+    this.transactionService.getAll().subscribe({
+      next: (data) => {
+        this.transactionCount = data.length;
+        this.recentTransactions = data.slice(-5).reverse();
+      },
+      error: () => { this.transactionCount = 0; this.recentTransactions = []; }
+    });
+  }
+}

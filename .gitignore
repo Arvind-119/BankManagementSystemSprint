@@ -1,0 +1,30 @@
+# Maven / Java
+**/target/
+*.class
+*.jar
+*.war
+*.ear
+*.log
+hs_err_pid*
+
+# Angular / Node
+bank-management-ui/node_modules/
+bank-management-ui/dist/
+bank-management-ui/.angular/
+bank-management-ui/coverage/
+
+# IDEs
+.idea/
+*.iml
+.classpath
+.project
+.settings/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Env / secrets
+.env
+.env.*
+*.pem
