@@ -11,6 +11,7 @@ import { SessionUser } from '../../../models/auth.model';
   template: `
     <header class="navbar" id="navbar">
       <div class="navbar-left">
+        <button class="mobile-menu-btn" (click)="toggleSidebar()">☰</button>
         <h2 class="navbar-title">Bank Management System</h2>
       </div>
       <div class="navbar-right">
@@ -47,6 +48,7 @@ import { SessionUser } from '../../../models/auth.model';
       z-index: 50;
     }
 
+    .navbar-left { display: flex; align-items: center; }
     .navbar-title { font-size: 18px; font-weight: 700; color: var(--text-primary); }
 
     .navbar-right { display: flex; align-items: center; gap: 16px; }
@@ -117,5 +119,9 @@ export class NavbarComponent implements OnInit {
   signOut(): void {
     this.authService.logout();
     this.router.navigate(['/login']);
+  }
+
+  toggleSidebar(): void {
+    document.body.classList.toggle('sidebar-open');
   }
 }

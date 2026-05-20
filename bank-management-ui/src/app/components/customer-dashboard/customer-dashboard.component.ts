@@ -13,6 +13,9 @@ import { SessionUser } from '../../models/auth.model';
   imports: [CommonModule, FormsModule],
   template: `
     <div class="cust-layout">
+      <!-- Overlay -->
+      <div class="sidebar-overlay" (click)="toggleSidebar()"></div>
+      
       <!-- Sidebar -->
       <aside class="cust-sidebar">
         <div class="sidebar-brand">
@@ -37,7 +40,10 @@ import { SessionUser } from '../../models/auth.model';
       <div class="cust-main">
         <!-- Topbar -->
         <header class="cust-topbar">
-          <h2>My Account</h2>
+          <div style="display: flex; align-items: center;">
+            <button class="mobile-menu-btn" (click)="toggleSidebar()" style="color: white; margin-right: 16px;">☰</button>
+            <h2>My Account</h2>
+          </div>
           <div class="topbar-right">
             <div class="user-chip">
               <div class="avatar">{{ user?.name?.charAt(0) || 'C' }}</div>
@@ -204,7 +210,7 @@ import { SessionUser } from '../../models/auth.model';
     .dl { display: block; font-size: 11px; color: rgba(255,255,255,0.35); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
     .dv { font-size: 14px; color: #fff; font-weight: 600; }
 
-    @media (max-width: 900px) { .quick-actions { grid-template-columns: 1fr 1fr; } .cust-sidebar { display: none; } .cust-main { margin-left: 0; } }
+    @media (max-width: 900px) { .quick-actions { grid-template-columns: 1fr 1fr; } }
   `]
 })
 export class CustomerDashboardComponent implements OnInit {
@@ -257,6 +263,11 @@ export class CustomerDashboardComponent implements OnInit {
     this.transferTo = '';
     this.transferAmount = null;
     this.transferDesc = '';
+    document.body.classList.remove('sidebar-open');
+  }
+
+  toggleSidebar(): void {
+    document.body.classList.toggle('sidebar-open');
   }
 
   doDeposit(): void {

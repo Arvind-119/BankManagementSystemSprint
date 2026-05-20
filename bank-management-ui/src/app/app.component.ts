@@ -13,6 +13,7 @@ import { filter } from 'rxjs/operators';
   template: `
     <!-- Full layout for manager pages -->
     <div class="app-layout" *ngIf="showManagerLayout">
+      <div class="sidebar-overlay" (click)="closeSidebar()"></div>
       <app-sidebar></app-sidebar>
       <div class="main-content">
         <app-navbar></app-navbar>
@@ -57,8 +58,13 @@ export class AppComponent {
     this.router.events.pipe(
       filter(e => e instanceof NavigationEnd)
     ).subscribe((e: any) => {
+      this.closeSidebar();
       const url = e.urlAfterRedirects || e.url;
       this.showManagerLayout = this.managerRoutes.some(r => url.startsWith(r));
     });
+  }
+
+  closeSidebar() {
+    document.body.classList.remove('sidebar-open');
   }
 }
