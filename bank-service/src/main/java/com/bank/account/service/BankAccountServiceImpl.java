@@ -110,6 +110,11 @@ public class BankAccountServiceImpl implements BankAccountService {
         BankAccount account = bankAccountRepository.findByAccountNo(accountNo)
                 .orElseThrow(() -> new ResourceNotFoundException("Account not found with account number: " + accountNo));
 
+        // Business rule borrowed from previous version: Minimum deposit is ₹100
+        if (request.getAmount().compareTo(new BigDecimal("100")) < 0) {
+            throw new InsufficientBalanceException("Minimum deposit amount is ₹100.");
+        }
+
         account.setBalance(account.getBalance().add(request.getAmount()));
         BankAccount savedAccount = bankAccountRepository.save(account);
         logger.info("Deposit of {} to account {} successful. New balance: {}",
@@ -139,11 +144,22 @@ public class BankAccountServiceImpl implements BankAccountService {
         BankAccount account = bankAccountRepository.findByAccountNo(accountNo)
                 .orElseThrow(() -> new ResourceNotFoundException("Account not found with account number: " + accountNo));
 
-        if (account.getBalance().compareTo(request.getAmount()) < 0) {
-            throw new InsufficientBalanceException("Insufficient balance. Current balance: " + account.getBalance());
+        // Business rule borrowed from previous version: Minimum withdrawal is ₹1,000
+        if (request.getAmount().compareTo(new BigDecimal("1000")) < 0) {
+            throw new InsufficientBalanceException("Minimum withdrawal amount is ₹1,000.");
         }
 
-        account.setBalance(account.getBalance().subtract(request.getAmount()));
+        if (account.getBalance().compareTo(request.getAmount()) < 0) {
+            throw new InsufficientBalanceException("Insufficient balance. Current balance: ₹" + account.getBalance());
+        }
+
+        // Business rule borrowed from previous version: Balance must remain at least ₹500 after withdrawal
+        BigDecimal balanceAfter = account.getBalance().subtract(request.getAmount());
+        if (balanceAfter.compareTo(new BigDecimal("500")) < 0) {
+            throw new InsufficientBalanceException("Cannot withdraw. Minimum balance of ₹500 must be maintained. Available for withdrawal: ₹" + account.getBalance().subtract(new BigDecimal("500")));
+        }
+
+        account.setBalance(balanceAfter);
         BankAccount savedAccount = bankAccountRepository.save(account);
         logger.info("Withdrawal of {} from account {} successful. New balance: {}",
                 request.getAmount(), accountNo, savedAccount.getBalance());

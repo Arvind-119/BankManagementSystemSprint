@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { CustomerService } from '../../../services/customer.service';
+import { AuthService } from '../../../services/auth.service';
 
 @Component({
   selector: 'app-customer-form',
@@ -20,24 +21,25 @@ import { CustomerService } from '../../../services/customer.service';
 
       <div class="form-container">
         <form [formGroup]="customerForm" (ngSubmit)="onSubmit()" id="customer-form">
+          <h3 class="form-section-title">Personal Information</h3>
           <div class="form-row">
             <div class="form-group">
-              <label for="firstName">First Name</label>
+              <label for="firstName">First Name *</label>
               <input type="text" class="form-control" id="firstName" formControlName="firstName" placeholder="Enter first name"
                 [class.is-invalid]="isFieldInvalid('firstName')">
-              <div *ngIf="isFieldInvalid('firstName')" class="error-message">First name is required</div>
+              <div *ngIf="isFieldInvalid('firstName')" class="error-message">First name is required (letters only, max 50)</div>
             </div>
             <div class="form-group">
-              <label for="lastName">Last Name</label>
+              <label for="lastName">Last Name *</label>
               <input type="text" class="form-control" id="lastName" formControlName="lastName" placeholder="Enter last name"
                 [class.is-invalid]="isFieldInvalid('lastName')">
-              <div *ngIf="isFieldInvalid('lastName')" class="error-message">Last name is required</div>
+              <div *ngIf="isFieldInvalid('lastName')" class="error-message">Last name is required (letters only, max 50)</div>
             </div>
           </div>
 
           <div class="form-row">
             <div class="form-group">
-              <label for="email">Email Address</label>
+              <label for="email">Email Address *</label>
               <input type="email" class="form-control" id="email" formControlName="email" placeholder="email@example.com"
                 [class.is-invalid]="isFieldInvalid('email')">
               <div *ngIf="isFieldInvalid('email')" class="error-message">
@@ -45,10 +47,23 @@ import { CustomerService } from '../../../services/customer.service';
               </div>
             </div>
             <div class="form-group">
-              <label for="snnId">SNN ID</label>
-              <input type="text" class="form-control" id="snnId" formControlName="snnId" placeholder="Enter SNN ID"
+              <label for="snnId">SSN ID *</label>
+              <input type="text" class="form-control" id="snnId" formControlName="snnId" placeholder="12-digit SSN ID" maxlength="12"
                 [class.is-invalid]="isFieldInvalid('snnId')">
-              <div *ngIf="isFieldInvalid('snnId')" class="error-message">SNN ID is required</div>
+              <div *ngIf="isFieldInvalid('snnId')" class="error-message">SSN ID must be exactly 12 digits</div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="contact">Contact Number</label>
+              <input type="text" class="form-control" id="contact" formControlName="contact" placeholder="10-digit mobile" maxlength="10"
+                [class.is-invalid]="isFieldInvalid('contact')">
+              <div *ngIf="isFieldInvalid('contact')" class="error-message">Must be 10 digits starting with 6-9</div>
+            </div>
+            <div class="form-group">
+              <label for="address">Address</label>
+              <input type="text" class="form-control" id="address" formControlName="address" placeholder="Enter address" maxlength="100">
             </div>
           </div>
 
@@ -57,45 +72,61 @@ import { CustomerService } from '../../../services/customer.service';
               <label for="age">Age</label>
               <input type="number" class="form-control" id="age" formControlName="age" placeholder="Enter age"
                 [class.is-invalid]="isFieldInvalid('age')">
-              <div *ngIf="isFieldInvalid('age')" class="error-message">Valid age is required</div>
+              <div *ngIf="isFieldInvalid('age')" class="error-message">Valid age is required (1-120)</div>
             </div>
             <div class="form-group">
               <label for="dateOfBirth">Date of Birth</label>
-              <input type="date" class="form-control" id="dateOfBirth" formControlName="dateOfBirth"
-                [class.is-invalid]="isFieldInvalid('dateOfBirth')">
-              <div *ngIf="isFieldInvalid('dateOfBirth')" class="error-message">Date of birth is required</div>
+              <input type="date" class="form-control" id="dateOfBirth" formControlName="dateOfBirth">
+            </div>
+          </div>
+
+          <h3 class="form-section-title">Banking Information</h3>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="bankAccountNo">Bank Account No</label>
+              <input type="text" class="form-control" id="bankAccountNo" formControlName="bankAccountNo" placeholder="Auto-generated if empty">
+            </div>
+            <div class="form-group">
+              <label for="aadharNo">Aadhaar Number</label>
+              <input type="text" class="form-control" id="aadharNo" formControlName="aadharNo" placeholder="12-digit Aadhaar" maxlength="12"
+                [class.is-invalid]="isFieldInvalid('aadharNo')">
+              <div *ngIf="isFieldInvalid('aadharNo')" class="error-message">Must be exactly 12 digits</div>
             </div>
           </div>
 
           <div class="form-row">
             <div class="form-group">
-              <label for="bankAccountNo">Bank Account No</label>
-              <input type="text" class="form-control" id="bankAccountNo" formControlName="bankAccountNo" placeholder="Enter bank account number"
-                [class.is-invalid]="isFieldInvalid('bankAccountNo')">
-              <div *ngIf="isFieldInvalid('bankAccountNo')" class="error-message">Bank account number is required</div>
+              <label for="panNo">PAN Number</label>
+              <input type="text" class="form-control" id="panNo" formControlName="panNo" placeholder="ABCDE1234F" maxlength="10"
+                style="text-transform: uppercase;"
+                [class.is-invalid]="isFieldInvalid('panNo')">
+              <div *ngIf="isFieldInvalid('panNo')" class="error-message">PAN format: 5 letters, 4 digits, 1 letter</div>
             </div>
             <div class="form-group">
-              <label for="aadharNo">Aadhar Number</label>
-              <input type="text" class="form-control" id="aadharNo" formControlName="aadharNo" placeholder="12-digit Aadhar number"
-                [class.is-invalid]="isFieldInvalid('aadharNo')">
-              <div *ngIf="isFieldInvalid('aadharNo')" class="error-message">
-                {{ customerForm.get('aadharNo')?.errors?.['required'] ? 'Aadhar number is required' : 'Must be 12 digits' }}
-              </div>
+              <label for="gender">Gender</label>
+              <select class="form-control" id="gender" formControlName="gender">
+                <option value="">Select Gender</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+              </select>
             </div>
           </div>
 
           <div class="form-group">
-            <label for="panNo">PAN Number</label>
-            <input type="text" class="form-control" id="panNo" formControlName="panNo" placeholder="10-character PAN number" style="text-transform: uppercase;"
-              [class.is-invalid]="isFieldInvalid('panNo')">
-            <div *ngIf="isFieldInvalid('panNo')" class="error-message">
-              {{ customerForm.get('panNo')?.errors?.['required'] ? 'PAN number is required' : 'Must be 10 characters' }}
-            </div>
+            <label for="maritalStatus">Marital Status</label>
+            <select class="form-control" id="maritalStatus" formControlName="maritalStatus">
+              <option value="">Select Status</option>
+              <option value="Single">Single</option>
+              <option value="Married">Married</option>
+              <option value="Divorced">Divorced</option>
+              <option value="Widowed">Widowed</option>
+            </select>
           </div>
 
           <div class="form-actions">
-            <button type="submit" class="btn btn-primary" [disabled]="customerForm.invalid" id="submit-customer-btn">
-              {{ isEdit ? '✓ Update Customer' : '+ Create Customer' }}
+            <button type="submit" class="btn btn-primary" [disabled]="customerForm.invalid || isSubmitting" id="submit-customer-btn">
+              {{ isSubmitting ? 'Saving...' : (isEdit ? '✓ Update Customer' : '+ Create Customer') }}
             </button>
             <a routerLink="/customers" class="btn btn-outline" id="cancel-customer-btn">Cancel</a>
           </div>
@@ -107,7 +138,12 @@ import { CustomerService } from '../../../services/customer.service';
       </div>
     </div>
   `,
-  styles: [``]
+  styles: [`
+    .form-section-title { font-size: 14px; font-weight: 700; color: rgba(255,255,255,0.6); text-transform: uppercase; letter-spacing: 1px; margin-top: 24px; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.06); }
+    .form-section-title:first-of-type { margin-top: 0; }
+    select.form-control { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23888' d='M6 8L1 3h10z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; }
+    select.form-control option { background: #1a1a2e; color: #fff; }
+  `]
 })
 export class CustomerFormComponent implements OnInit {
   customerForm!: FormGroup;
@@ -115,25 +151,31 @@ export class CustomerFormComponent implements OnInit {
   customerId!: number;
   toastMessage = '';
   toastType = 'success';
+  isSubmitting = false;
 
   constructor(
     private fb: FormBuilder,
     private customerService: CustomerService,
+    private authService: AuthService,
     private router: Router,
     private route: ActivatedRoute
   ) {}
 
   ngOnInit(): void {
     this.customerForm = this.fb.group({
-      snnId: ['', Validators.required],
-      firstName: ['', Validators.required],
-      lastName: ['', Validators.required],
+      snnId: ['', [Validators.required, Validators.pattern(/^\d{12}$/)]],
+      firstName: ['', [Validators.required, Validators.pattern(/^[A-Za-z\s]{1,50}$/)]],
+      lastName: ['', [Validators.required, Validators.pattern(/^[A-Za-z\s]{1,50}$/)]],
       email: ['', [Validators.required, Validators.email]],
-      age: ['', [Validators.required, Validators.min(1)]],
-      dateOfBirth: ['', Validators.required],
-      bankAccountNo: ['', Validators.required],
-      aadharNo: ['', [Validators.required, Validators.pattern(/^\d{12}$/)]],
-      panNo: ['', [Validators.required, Validators.pattern(/^[A-Za-z0-9]{10}$/)]]
+      contact: ['', [Validators.pattern(/^[6-9]\d{9}$/)]],
+      address: [''],
+      age: ['', [Validators.min(1), Validators.max(120)]],
+      dateOfBirth: [''],
+      bankAccountNo: [''],
+      aadharNo: ['', [Validators.pattern(/^\d{12}$/)]],
+      panNo: ['', [Validators.pattern(/^[A-Za-z]{5}\d{4}[A-Za-z]$/)]],
+      gender: [''],
+      maritalStatus: ['']
     });
 
     const id = this.route.snapshot.paramMap.get('id');
@@ -152,11 +194,15 @@ export class CustomerFormComponent implements OnInit {
           firstName: customer.firstName,
           lastName: customer.lastName,
           email: customer.email,
+          contact: customer.contact,
+          address: customer.address,
           age: customer.age,
           dateOfBirth: customer.dateOfBirth,
           bankAccountNo: customer.bankAccountNo,
           aadharNo: customer.aadharNo,
-          panNo: customer.panNo
+          panNo: customer.panNo,
+          gender: customer.gender,
+          maritalStatus: customer.maritalStatus
         });
       },
       error: (err) => {
@@ -168,29 +214,51 @@ export class CustomerFormComponent implements OnInit {
 
   onSubmit(): void {
     if (this.customerForm.invalid) return;
+    this.isSubmitting = true;
 
     const formData = this.customerForm.value;
 
-    if (this.isEdit) {
+    // For new customers created by manager, use auth service's register-by-manager endpoint
+    if (!this.isEdit) {
+      this.authService.registerByManager({
+        ssnId: formData.snnId,
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        email: formData.email,
+        contact: formData.contact || '',
+        password: formData.snnId, // SSN as default password
+        address: formData.address || '',
+        aadharNo: formData.aadharNo,
+        panNo: formData.panNo,
+        dateOfBirth: formData.dateOfBirth || null,
+        gender: formData.gender || '',
+        maritalStatus: formData.maritalStatus || ''
+      }).subscribe({
+        next: (res) => {
+          this.isSubmitting = false;
+          if (res.success) {
+            this.showToast('Customer created successfully', 'success');
+            setTimeout(() => this.router.navigate(['/customers']), 1500);
+          } else {
+            this.showToast(res.message || 'Failed to create customer', 'error');
+          }
+        },
+        error: (err) => {
+          this.isSubmitting = false;
+          this.showToast(err.error?.message || 'Failed to create customer', 'error');
+        }
+      });
+    } else {
       this.customerService.update(this.customerId, formData).subscribe({
         next: () => {
+          this.isSubmitting = false;
           this.showToast('Customer updated successfully', 'success');
           setTimeout(() => this.router.navigate(['/customers']), 1500);
         },
         error: (err) => {
+          this.isSubmitting = false;
           console.error('Error updating customer:', err);
           this.showToast('Failed to update customer', 'error');
-        }
-      });
-    } else {
-      this.customerService.create(formData).subscribe({
-        next: () => {
-          this.showToast('Customer created successfully', 'success');
-          setTimeout(() => this.router.navigate(['/customers']), 1500);
-        },
-        error: (err) => {
-          console.error('Error creating customer:', err);
-          this.showToast('Failed to create customer', 'error');
         }
       });
     }

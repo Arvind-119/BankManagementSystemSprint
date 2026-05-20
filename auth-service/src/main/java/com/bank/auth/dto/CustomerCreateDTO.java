@@ -1,11 +1,12 @@
-package com.bank.customer.dto;
+package com.bank.auth.dto;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
-public class CustomerResponseDTO {
+/**
+ * DTO for creating a customer via the customer-service Feign client.
+ */
+public class CustomerCreateDTO {
 
-    private Long id;
     private String snnId;
     private String firstName;
     private String lastName;
@@ -19,16 +20,10 @@ public class CustomerResponseDTO {
     private String address;
     private String gender;
     private String maritalStatus;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
 
-    // No-arg constructor
-    public CustomerResponseDTO() {}
+    public CustomerCreateDTO() {}
 
     // Getters and Setters
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
-
     public String getSnnId() { return snnId; }
     public void setSnnId(String snnId) { this.snnId = snnId; }
 
@@ -67,10 +62,4 @@ public class CustomerResponseDTO {
 
     public String getMaritalStatus() { return maritalStatus; }
     public void setMaritalStatus(String maritalStatus) { this.maritalStatus = maritalStatus; }
-
-    public LocalDateTime getCreatedAt() { return createdAt; }
-    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
-
-    public LocalDateTime getUpdatedAt() { return updatedAt; }
-    public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
 }

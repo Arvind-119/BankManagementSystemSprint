@@ -51,6 +51,13 @@ public class CustomerController {
         return new ResponseEntity<>(customer, HttpStatus.OK);
     }
 
+    @GetMapping("/ssn/{snnId}")
+    @Operation(summary = "Get customer by SSN ID", description = "Retrieves a customer by their SSN ID")
+    public ResponseEntity<CustomerResponseDTO> getCustomerBySsnId(@PathVariable String snnId) {
+        CustomerResponseDTO customer = customerService.getCustomerBySsnId(snnId);
+        return new ResponseEntity<>(customer, HttpStatus.OK);
+    }
+
     @PutMapping("/{id}")
     @Operation(summary = "Update a customer", description = "Updates an existing customer record")
     public ResponseEntity<CustomerResponseDTO> updateCustomer(@PathVariable Long id,

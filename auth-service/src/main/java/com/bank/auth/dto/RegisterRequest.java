@@ -1,14 +1,17 @@
-package com.bank.customer.dto;
+package com.bank.auth.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 import java.time.LocalDate;
 
-public class CustomerRequestDTO {
+public class RegisterRequest {
 
-    @NotBlank(message = "SNN ID is required")
-    private String snnId;
+    @NotBlank(message = "SSN ID is required")
+    @Size(min = 12, max = 12, message = "SSN ID must be exactly 12 digits")
+    private String ssnId;
 
     @NotBlank(message = "First name is required")
     private String firstName;
@@ -20,30 +23,27 @@ public class CustomerRequestDTO {
     @Email(message = "Email should be valid")
     private String email;
 
-    private Integer age;
-
-    private LocalDate dateOfBirth;
-
-    private String bankAccountNo;
-
-    private String aadharNo;
-
-    private String panNo;
-
+    @NotBlank(message = "Contact number is required")
     private String contact;
 
+    @NotBlank(message = "Password is required")
+    private String password;
+
+    @NotBlank(message = "Address is required")
     private String address;
 
+    // Optional fields
+    private String aadharNo;
+    private String panNo;
+    private LocalDate dateOfBirth;
     private String gender;
-
     private String maritalStatus;
 
-    // No-arg constructor
-    public CustomerRequestDTO() {}
+    public RegisterRequest() {}
 
     // Getters and Setters
-    public String getSnnId() { return snnId; }
-    public void setSnnId(String snnId) { this.snnId = snnId; }
+    public String getSsnId() { return ssnId; }
+    public void setSsnId(String ssnId) { this.ssnId = ssnId; }
 
     public String getFirstName() { return firstName; }
     public void setFirstName(String firstName) { this.firstName = firstName; }
@@ -54,14 +54,14 @@ public class CustomerRequestDTO {
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }
 
-    public Integer getAge() { return age; }
-    public void setAge(Integer age) { this.age = age; }
+    public String getContact() { return contact; }
+    public void setContact(String contact) { this.contact = contact; }
 
-    public LocalDate getDateOfBirth() { return dateOfBirth; }
-    public void setDateOfBirth(LocalDate dateOfBirth) { this.dateOfBirth = dateOfBirth; }
+    public String getPassword() { return password; }
+    public void setPassword(String password) { this.password = password; }
 
-    public String getBankAccountNo() { return bankAccountNo; }
-    public void setBankAccountNo(String bankAccountNo) { this.bankAccountNo = bankAccountNo; }
+    public String getAddress() { return address; }
+    public void setAddress(String address) { this.address = address; }
 
     public String getAadharNo() { return aadharNo; }
     public void setAadharNo(String aadharNo) { this.aadharNo = aadharNo; }
@@ -69,11 +69,8 @@ public class CustomerRequestDTO {
     public String getPanNo() { return panNo; }
     public void setPanNo(String panNo) { this.panNo = panNo; }
 
-    public String getContact() { return contact; }
-    public void setContact(String contact) { this.contact = contact; }
-
-    public String getAddress() { return address; }
-    public void setAddress(String address) { this.address = address; }
+    public LocalDate getDateOfBirth() { return dateOfBirth; }
+    public void setDateOfBirth(LocalDate dateOfBirth) { this.dateOfBirth = dateOfBirth; }
 
     public String getGender() { return gender; }
     public void setGender(String gender) { this.gender = gender; }

@@ -2,10 +2,11 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { CustomerService } from '../../services/customer.service';
-import { EmployeeService } from '../../services/employee.service';
 import { AccountService } from '../../services/account.service';
 import { TransactionService } from '../../services/transaction.service';
+import { AuthService } from '../../services/auth.service';
 import { Transaction } from '../../models/transaction.model';
+import { SessionUser } from '../../models/auth.model';
 
 @Component({
   selector: 'app-dashboard',
@@ -15,7 +16,7 @@ import { Transaction } from '../../models/transaction.model';
     <div class="dashboard">
       <div class="dashboard-header">
         <h2>Dashboard Overview</h2>
-        <p>Welcome back, Bank Manager</p>
+        <p>Welcome back, {{ user?.name || 'Manager' }} 👋</p>
       </div>
 
       <div class="stats-grid">
@@ -26,16 +27,6 @@ import { Transaction } from '../../models/transaction.model';
           <div class="stat-info">
             <h3>{{ customerCount }}</h3>
             <span>Total Customers</span>
-          </div>
-        </div>
-
-        <div class="stat-card employees-card" id="stat-employees">
-          <div class="stat-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
-          </div>
-          <div class="stat-info">
-            <h3>{{ employeeCount }}</h3>
-            <span>Total Employees</span>
           </div>
         </div>
 
@@ -56,6 +47,16 @@ import { Transaction } from '../../models/transaction.model';
           <div class="stat-info">
             <h3>{{ transactionCount }}</h3>
             <span>Total Transactions</span>
+          </div>
+        </div>
+
+        <div class="stat-card balance-card" id="stat-balance">
+          <div class="stat-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          </div>
+          <div class="stat-info">
+            <h3>₹{{ totalBalance | number:'1.0-0' }}</h3>
+            <span>Total Deposits</span>
           </div>
         </div>
       </div>
@@ -109,10 +110,6 @@ import { Transaction } from '../../models/transaction.model';
               <span class="action-icon">👤</span>
               <span>Add Customer</span>
             </a>
-            <a routerLink="/employees/new" class="action-btn" id="action-add-employee">
-              <span class="action-icon">👨‍💼</span>
-              <span>Add Employee</span>
-            </a>
             <a routerLink="/accounts/new" class="action-btn" id="action-create-account">
               <span class="action-icon">🏦</span>
               <span>Create Account</span>
@@ -120,6 +117,10 @@ import { Transaction } from '../../models/transaction.model';
             <a routerLink="/accounts/operations" class="action-btn" id="action-operations">
               <span class="action-icon">💰</span>
               <span>Banking Ops</span>
+            </a>
+            <a routerLink="/transactions" class="action-btn" id="action-view-txn">
+              <span class="action-icon">💳</span>
+              <span>View Txns</span>
             </a>
           </div>
         </div>
@@ -156,9 +157,9 @@ import { Transaction } from '../../models/transaction.model';
       color: white;
     }
     .customers-card .stat-icon { background: linear-gradient(135deg, #667eea, #764ba2); }
-    .employees-card .stat-icon { background: linear-gradient(135deg, #00d2ff, #3a7bd5); }
     .accounts-card .stat-icon { background: linear-gradient(135deg, #f7971e, #ffd200); }
     .transactions-card .stat-icon { background: linear-gradient(135deg, #11998e, #38ef7d); }
+    .balance-card .stat-icon { background: linear-gradient(135deg, #00d2ff, #3a7bd5); }
 
     .stat-info h3 { font-size: 1.8rem; font-weight: 700; color: #fff; margin: 0; }
     .stat-info span { font-size: 0.8rem; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 0.5px; }
@@ -222,31 +223,33 @@ import { Transaction } from '../../models/transaction.model';
   `]
 })
 export class DashboardComponent implements OnInit {
+  user: SessionUser | null = null;
   customerCount = 0;
-  employeeCount = 0;
   accountCount = 0;
   transactionCount = 0;
+  totalBalance = 0;
   recentTransactions: Transaction[] = [];
 
   constructor(
     private customerService: CustomerService,
-    private employeeService: EmployeeService,
     private accountService: AccountService,
-    private transactionService: TransactionService
+    private transactionService: TransactionService,
+    private authService: AuthService
   ) {}
 
   ngOnInit(): void {
+    this.user = this.authService.getSession();
+
     this.customerService.getAll().subscribe({
       next: (data) => this.customerCount = data.length,
       error: () => this.customerCount = 0
     });
-    this.employeeService.getAll().subscribe({
-      next: (data) => this.employeeCount = data.length,
-      error: () => this.employeeCount = 0
-    });
     this.accountService.getAll().subscribe({
-      next: (data) => this.accountCount = data.length,
-      error: () => this.accountCount = 0
+      next: (data) => {
+        this.accountCount = data.length;
+        this.totalBalance = data.reduce((sum, a) => sum + (a.balance || 0), 0);
+      },
+      error: () => { this.accountCount = 0; this.totalBalance = 0; }
     });
     this.transactionService.getAll().subscribe({
       next: (data) => {

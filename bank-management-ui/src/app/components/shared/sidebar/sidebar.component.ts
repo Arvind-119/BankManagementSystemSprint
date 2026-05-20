@@ -23,33 +23,46 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
         </div>
         <div class="brand-text">
           <span class="brand-name">BankSys</span>
-          <span class="brand-sub">Management</span>
+          <span class="brand-sub">MANAGER</span>
         </div>
       </div>
 
       <nav class="sidebar-nav">
         <div class="nav-section">
-          <span class="nav-section-title">MAIN MENU</span>
+          <span class="nav-section-title">DASHBOARD</span>
         </div>
 
         <a routerLink="/dashboard" routerLinkActive="active" id="nav-dashboard" class="nav-item">
           <span class="nav-icon">📊</span>
-          <span class="nav-text">Dashboard</span>
+          <span class="nav-text">Overview</span>
         </a>
+
+        <div class="nav-section">
+          <span class="nav-section-title">CUSTOMER MGMT</span>
+        </div>
 
         <a routerLink="/customers" routerLinkActive="active" id="nav-customers" class="nav-item">
           <span class="nav-icon">👥</span>
-          <span class="nav-text">Customers</span>
+          <span class="nav-text">All Customers</span>
         </a>
 
-        <a routerLink="/employees" routerLinkActive="active" id="nav-employees" class="nav-item">
-          <span class="nav-icon">💼</span>
-          <span class="nav-text">Employees</span>
+        <a routerLink="/customers/new" routerLinkActive="active" id="nav-add-customer" class="nav-item">
+          <span class="nav-icon">➕</span>
+          <span class="nav-text">Add Customer</span>
         </a>
+
+        <div class="nav-section">
+          <span class="nav-section-title">BANKING</span>
+        </div>
 
         <a routerLink="/accounts" routerLinkActive="active" id="nav-accounts" class="nav-item">
           <span class="nav-icon">🏦</span>
           <span class="nav-text">Accounts</span>
+        </a>
+
+        <a routerLink="/accounts/operations" routerLinkActive="active" id="nav-operations" class="nav-item">
+          <span class="nav-icon">💰</span>
+          <span class="nav-text">Banking Ops</span>
         </a>
 
         <a routerLink="/transactions" routerLinkActive="active" id="nav-transactions" class="nav-item">
@@ -90,14 +103,9 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
       border-bottom: 1px solid var(--border-color);
     }
 
-    .brand-icon {
-      flex-shrink: 0;
-    }
+    .brand-icon { flex-shrink: 0; }
 
-    .brand-text {
-      display: flex;
-      flex-direction: column;
-    }
+    .brand-text { display: flex; flex-direction: column; }
 
     .brand-name {
       font-size: 18px;
@@ -110,22 +118,16 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
     }
 
     .brand-sub {
-      font-size: 11px;
+      font-size: 10px;
       color: var(--text-muted);
-      font-weight: 500;
-      letter-spacing: 1px;
-      text-transform: uppercase;
+      font-weight: 700;
+      letter-spacing: 2px;
     }
 
-    .sidebar-nav {
-      flex: 1;
-      padding: 16px 12px;
-    }
+    .sidebar-nav { flex: 1; padding: 16px 12px; }
 
-    .nav-section {
-      padding: 0 12px;
-      margin-bottom: 8px;
-    }
+    .nav-section { padding: 0 12px; margin-bottom: 8px; margin-top: 16px; }
+    .nav-section:first-child { margin-top: 0; }
 
     .nav-section-title {
       font-size: 10px;
@@ -150,15 +152,9 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
       position: relative;
     }
 
-    .nav-item:hover {
-      background: rgba(255, 255, 255, 0.05);
-      color: var(--text-primary);
-    }
+    .nav-item:hover { background: rgba(255, 255, 255, 0.05); color: var(--text-primary); }
 
-    .nav-item.active {
-      background: rgba(102, 126, 234, 0.15);
-      color: var(--text-primary);
-    }
+    .nav-item.active { background: rgba(102, 126, 234, 0.15); color: var(--text-primary); }
 
     .nav-item.active::before {
       content: '';
@@ -172,20 +168,10 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
       border-radius: 0 4px 4px 0;
     }
 
-    .nav-icon {
-      font-size: 18px;
-      width: 24px;
-      text-align: center;
-    }
+    .nav-icon { font-size: 18px; width: 24px; text-align: center; }
+    .nav-text { font-size: 14px; }
 
-    .nav-text {
-      font-size: 14px;
-    }
-
-    .sidebar-footer {
-      padding: 16px 12px;
-      border-top: 1px solid var(--border-color);
-    }
+    .sidebar-footer { padding: 16px 12px; border-top: 1px solid var(--border-color); }
 
     .footer-card {
       background: rgba(102, 126, 234, 0.08);
@@ -195,24 +181,9 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
       text-align: center;
     }
 
-    .footer-icon {
-      font-size: 24px;
-      margin-bottom: 8px;
-    }
-
-    .footer-text {
-      display: block;
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--text-primary);
-    }
-
-    .footer-sub {
-      display: block;
-      font-size: 10px;
-      color: var(--text-muted);
-      margin-top: 2px;
-    }
+    .footer-icon { font-size: 24px; margin-bottom: 8px; }
+    .footer-text { display: block; font-size: 12px; font-weight: 600; color: var(--text-primary); }
+    .footer-sub { display: block; font-size: 10px; color: var(--text-muted); margin-top: 2px; }
   `]
 })
 export class SidebarComponent {}

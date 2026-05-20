@@ -9,6 +9,10 @@ export interface Customer {
   bankAccountNo: string;
   aadharNo: string;
   panNo: string;
+  contact: string;
+  address: string;
+  gender: string;
+  maritalStatus: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -18,9 +22,13 @@ export interface CustomerRequest {
   firstName: string;
   lastName: string;
   email: string;
-  age: number;
-  dateOfBirth: string;
-  bankAccountNo: string;
-  aadharNo: string;
-  panNo: string;
+  age?: number;
+  dateOfBirth?: string;
+  bankAccountNo?: string;
+  aadharNo?: string;
+  panNo?: string;
+  contact?: string;
+  address?: string;
+  gender?: string;
+  maritalStatus?: string;
 }

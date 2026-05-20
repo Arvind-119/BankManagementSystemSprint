@@ -1,9 +1,12 @@
-package com.bank.customer.dto;
+package com.bank.auth.dto;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-public class CustomerResponseDTO {
+/**
+ * DTO matching the customer-service's CustomerResponseDTO for Feign calls.
+ */
+public class CustomerDTO {
 
     private Long id;
     private String snnId;
@@ -22,8 +25,7 @@ public class CustomerResponseDTO {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    // No-arg constructor
-    public CustomerResponseDTO() {}
+    public CustomerDTO() {}
 
     // Getters and Setters
     public Long getId() { return id; }

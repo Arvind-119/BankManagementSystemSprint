@@ -49,7 +49,7 @@ import { Customer } from '../../../models/customer.model';
               <th>SNN ID</th>
               <th>Name</th>
               <th>Email</th>
-              <th>Age</th>
+              <th>Contact</th>
               <th>Bank Account No</th>
               <th>PAN No</th>
               <th>Actions</th>
@@ -63,9 +63,9 @@ import { Customer } from '../../../models/customer.model';
                 <span>{{ customer.firstName }} {{ customer.lastName }}</span>
               </td>
               <td>{{ customer.email }}</td>
-              <td>{{ customer.age }}</td>
-              <td><code>{{ customer.bankAccountNo }}</code></td>
-              <td><code>{{ customer.panNo }}</code></td>
+              <td>{{ customer.contact || '—' }}</td>
+              <td><code>{{ customer.bankAccountNo || '—' }}</code></td>
+              <td><code>{{ customer.panNo || '—' }}</code></td>
               <td>
                 <div class="action-buttons">
                   <a [routerLink]="['/customers/edit', customer.id]" class="btn btn-sm btn-outline" [id]="'edit-customer-' + customer.id">✏️ Edit</a>
@@ -173,12 +173,14 @@ export class CustomerListComponent implements OnInit {
       c.email?.toLowerCase().includes(term) ||
       c.snnId?.toLowerCase().includes(term) ||
       c.panNo?.toLowerCase().includes(term) ||
-      c.bankAccountNo?.toLowerCase().includes(term)
+      c.bankAccountNo?.toLowerCase().includes(term) ||
+      c.contact?.toLowerCase().includes(term) ||
+      c.address?.toLowerCase().includes(term)
     );
   }
 
   deleteCustomer(id: number): void {
-    if (confirm('Are you sure you want to delete this customer?')) {
+    if (confirm('Are you sure you want to delete this customer? This action cannot be undone.')) {
       this.customerService.delete(id).subscribe({
         next: () => {
           this.showToast('Customer deleted successfully', 'success');

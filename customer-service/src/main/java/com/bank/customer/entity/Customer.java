@@ -32,20 +32,27 @@ public class Customer {
     @Column(unique = true, nullable = false)
     private String email;
 
-    @Column(nullable = false)
     private Integer age;
 
-    @Column(nullable = false)
     private LocalDate dateOfBirth;
 
     @Column(unique = true)
     private String bankAccountNo;
 
-    @Column(unique = true, nullable = false, length = 12)
+    @Column(unique = true, length = 12)
     private String aadharNo;
 
-    @Column(unique = true, nullable = false, length = 10)
+    @Column(unique = true, length = 10)
     private String panNo;
+
+    // New fields borrowed from previous version
+    private String contact;
+
+    private String address;
+
+    private String gender;
+
+    private String maritalStatus;
 
     private LocalDateTime createdAt;
 
@@ -66,118 +73,52 @@ public class Customer {
     public Customer() {
     }
 
-    // All-arg constructor
-    public Customer(Long id, String snnId, String firstName, String lastName, String email,
-                    Integer age, LocalDate dateOfBirth, String bankAccountNo, String aadharNo,
-                    String panNo, LocalDateTime createdAt, LocalDateTime updatedAt) {
-        this.id = id;
-        this.snnId = snnId;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.email = email;
-        this.age = age;
-        this.dateOfBirth = dateOfBirth;
-        this.bankAccountNo = bankAccountNo;
-        this.aadharNo = aadharNo;
-        this.panNo = panNo;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
-    }
-
     // Getters and Setters
-    public Long getId() {
-        return id;
-    }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+    public String getSnnId() { return snnId; }
+    public void setSnnId(String snnId) { this.snnId = snnId; }
 
-    public String getSnnId() {
-        return snnId;
-    }
+    public String getFirstName() { return firstName; }
+    public void setFirstName(String firstName) { this.firstName = firstName; }
 
-    public void setSnnId(String snnId) {
-        this.snnId = snnId;
-    }
+    public String getLastName() { return lastName; }
+    public void setLastName(String lastName) { this.lastName = lastName; }
 
-    public String getFirstName() {
-        return firstName;
-    }
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
+    public Integer getAge() { return age; }
+    public void setAge(Integer age) { this.age = age; }
 
-    public String getLastName() {
-        return lastName;
-    }
+    public LocalDate getDateOfBirth() { return dateOfBirth; }
+    public void setDateOfBirth(LocalDate dateOfBirth) { this.dateOfBirth = dateOfBirth; }
 
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
+    public String getBankAccountNo() { return bankAccountNo; }
+    public void setBankAccountNo(String bankAccountNo) { this.bankAccountNo = bankAccountNo; }
 
-    public String getEmail() {
-        return email;
-    }
+    public String getAadharNo() { return aadharNo; }
+    public void setAadharNo(String aadharNo) { this.aadharNo = aadharNo; }
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
+    public String getPanNo() { return panNo; }
+    public void setPanNo(String panNo) { this.panNo = panNo; }
 
-    public Integer getAge() {
-        return age;
-    }
+    public String getContact() { return contact; }
+    public void setContact(String contact) { this.contact = contact; }
 
-    public void setAge(Integer age) {
-        this.age = age;
-    }
+    public String getAddress() { return address; }
+    public void setAddress(String address) { this.address = address; }
 
-    public LocalDate getDateOfBirth() {
-        return dateOfBirth;
-    }
+    public String getGender() { return gender; }
+    public void setGender(String gender) { this.gender = gender; }
 
-    public void setDateOfBirth(LocalDate dateOfBirth) {
-        this.dateOfBirth = dateOfBirth;
-    }
+    public String getMaritalStatus() { return maritalStatus; }
+    public void setMaritalStatus(String maritalStatus) { this.maritalStatus = maritalStatus; }
 
-    public String getBankAccountNo() {
-        return bankAccountNo;
-    }
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 
-    public void setBankAccountNo(String bankAccountNo) {
-        this.bankAccountNo = bankAccountNo;
-    }
-
-    public String getAadharNo() {
-        return aadharNo;
-    }
-
-    public void setAadharNo(String aadharNo) {
-        this.aadharNo = aadharNo;
-    }
-
-    public String getPanNo() {
-        return panNo;
-    }
-
-    public void setPanNo(String panNo) {
-        this.panNo = panNo;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
-    }
+    public LocalDateTime getUpdatedAt() { return updatedAt; }
+    public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
 }

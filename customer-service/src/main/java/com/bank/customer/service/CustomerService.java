@@ -13,6 +13,8 @@ public interface CustomerService {
 
     CustomerResponseDTO getCustomerById(Long id);
 
+    CustomerResponseDTO getCustomerBySsnId(String snnId);
+
     CustomerResponseDTO updateCustomer(Long id, CustomerRequestDTO request);
 
     void deleteCustomer(Long id);

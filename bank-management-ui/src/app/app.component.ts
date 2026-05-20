@@ -1,15 +1,18 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterOutlet } from '@angular/router';
+import { RouterOutlet, Router, NavigationEnd } from '@angular/router';
 import { SidebarComponent } from './components/shared/sidebar/sidebar.component';
 import { NavbarComponent } from './components/shared/navbar/navbar.component';
+import { AuthService } from './services/auth.service';
+import { filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
   standalone: true,
   imports: [CommonModule, RouterOutlet, SidebarComponent, NavbarComponent],
   template: `
-    <div class="app-layout">
+    <!-- Full layout for manager pages -->
+    <div class="app-layout" *ngIf="showManagerLayout">
       <app-sidebar></app-sidebar>
       <div class="main-content">
         <app-navbar></app-navbar>
@@ -17,6 +20,11 @@ import { NavbarComponent } from './components/shared/navbar/navbar.component';
           <router-outlet></router-outlet>
         </div>
       </div>
+    </div>
+
+    <!-- No layout wrapper for login, register, and customer dashboard (they have their own) -->
+    <div *ngIf="!showManagerLayout">
+      <router-outlet></router-outlet>
     </div>
   `,
   styles: [`
@@ -41,4 +49,16 @@ import { NavbarComponent } from './components/shared/navbar/navbar.component';
 })
 export class AppComponent {
   title = 'Bank Management System';
+  showManagerLayout = false;
+
+  private managerRoutes = ['/dashboard', '/customers', '/accounts', '/transactions'];
+
+  constructor(private router: Router, private authService: AuthService) {
+    this.router.events.pipe(
+      filter(e => e instanceof NavigationEnd)
+    ).subscribe((e: any) => {
+      const url = e.urlAfterRedirects || e.url;
+      this.showManagerLayout = this.managerRoutes.some(r => url.startsWith(r));
+    });
+  }
 }

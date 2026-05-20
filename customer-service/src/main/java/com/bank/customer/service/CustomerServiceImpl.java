@@ -23,6 +23,15 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public CustomerResponseDTO createCustomer(CustomerRequestDTO request) {
+        // Check for duplicate SSN
+        if (customerRepository.existsBySnnId(request.getSnnId())) {
+            throw new IllegalArgumentException("A customer with this SSN ID already exists.");
+        }
+        // Check for duplicate email
+        if (customerRepository.existsByEmail(request.getEmail())) {
+            throw new IllegalArgumentException("A customer with this email already exists.");
+        }
+
         Customer customer = mapToEntity(request);
         Customer savedCustomer = customerRepository.save(customer);
         return mapToResponseDTO(savedCustomer);
@@ -46,6 +55,14 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public CustomerResponseDTO getCustomerBySsnId(String snnId) {
+        Customer customer = customerRepository.findBySnnId(snnId)
+                .orElseThrow(() -> new ResourceNotFoundException("Customer not found with SSN ID: " + snnId));
+        return mapToResponseDTO(customer);
+    }
+
+    @Override
     public CustomerResponseDTO updateCustomer(Long id, CustomerRequestDTO request) {
         Customer existingCustomer = customerRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Customer not found with id: " + id));
@@ -59,6 +76,10 @@ public class CustomerServiceImpl implements CustomerService {
         existingCustomer.setBankAccountNo(request.getBankAccountNo());
         existingCustomer.setAadharNo(request.getAadharNo());
         existingCustomer.setPanNo(request.getPanNo());
+        existingCustomer.setContact(request.getContact());
+        existingCustomer.setAddress(request.getAddress());
+        existingCustomer.setGender(request.getGender());
+        existingCustomer.setMaritalStatus(request.getMaritalStatus());
 
         Customer updatedCustomer = customerRepository.save(existingCustomer);
         return mapToResponseDTO(updatedCustomer);
@@ -84,6 +105,10 @@ public class CustomerServiceImpl implements CustomerService {
         customer.setBankAccountNo(dto.getBankAccountNo());
         customer.setAadharNo(dto.getAadharNo());
         customer.setPanNo(dto.getPanNo());
+        customer.setContact(dto.getContact());
+        customer.setAddress(dto.getAddress());
+        customer.setGender(dto.getGender());
+        customer.setMaritalStatus(dto.getMaritalStatus());
         return customer;
     }
 
@@ -99,6 +124,10 @@ public class CustomerServiceImpl implements CustomerService {
         dto.setBankAccountNo(customer.getBankAccountNo());
         dto.setAadharNo(customer.getAadharNo());
         dto.setPanNo(customer.getPanNo());
+        dto.setContact(customer.getContact());
+        dto.setAddress(customer.getAddress());
+        dto.setGender(customer.getGender());
+        dto.setMaritalStatus(customer.getMaritalStatus());
         dto.setCreatedAt(customer.getCreatedAt());
         dto.setUpdatedAt(customer.getUpdatedAt());
         return dto;
