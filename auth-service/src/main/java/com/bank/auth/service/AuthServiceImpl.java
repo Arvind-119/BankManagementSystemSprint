@@ -109,8 +109,8 @@ public class AuthServiceImpl implements AuthService {
             customerCreate.setEmail(request.getEmail());
             customerCreate.setContact(request.getContact());
             customerCreate.setAddress(request.getAddress());
-            customerCreate.setAadharNo(request.getAadharNo() != null ? request.getAadharNo() : "");
-            customerCreate.setPanNo(request.getPanNo() != null ? request.getPanNo() : "");
+            customerCreate.setAadharNo((request.getAadharNo() == null || request.getAadharNo().trim().isEmpty()) ? null : request.getAadharNo());
+            customerCreate.setPanNo((request.getPanNo() == null || request.getPanNo().trim().isEmpty()) ? null : request.getPanNo());
             customerCreate.setDateOfBirth(request.getDateOfBirth());
             customerCreate.setGender(request.getGender());
             customerCreate.setMaritalStatus(request.getMaritalStatus());

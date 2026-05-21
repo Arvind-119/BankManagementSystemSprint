@@ -4,5 +4,6 @@ public enum AccountType {
     SAVINGS,
     CURRENT,
     JOINT,
-    SALARY
+    SALARY,
+    FIXED_DEPOSIT
 }
