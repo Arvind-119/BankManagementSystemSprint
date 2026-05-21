@@ -8,6 +8,9 @@ import com.bank.auth.dto.RegisterRequest;
 import com.bank.auth.dto.RegisterResponse;
 import com.bank.auth.entity.UserCredential;
 import com.bank.auth.feign.CustomerClient;
+import com.bank.auth.feign.BankAccountClient;
+import com.bank.auth.dto.AccountRequestDTO;
+import com.bank.auth.dto.AccountResponseDTO;
 import com.bank.auth.repository.UserCredentialRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,11 +27,14 @@ public class AuthServiceImpl implements AuthService {
 
     private final UserCredentialRepository credentialRepository;
     private final CustomerClient customerClient;
+    private final BankAccountClient bankAccountClient;
 
     public AuthServiceImpl(UserCredentialRepository credentialRepository,
-                           CustomerClient customerClient) {
+                           CustomerClient customerClient,
+                           BankAccountClient bankAccountClient) {
         this.credentialRepository = credentialRepository;
         this.customerClient = customerClient;
+        this.bankAccountClient = bankAccountClient;
     }
 
     @Override
@@ -132,6 +138,24 @@ public class AuthServiceImpl implements AuthService {
             return response;
         }
 
+        // Create default bank account automatically
+        String bankAccountNo = null;
+        try {
+            AccountRequestDTO accountReq = new AccountRequestDTO();
+            accountReq.setCustomerId(createdCustomer.getId());
+            accountReq.setAccountType("SAVINGS");
+            accountReq.setBranchName("Main Branch");
+            accountReq.setIfscCode("BANK0000001");
+            accountReq.setInitialDeposit(java.math.BigDecimal.ZERO);
+            
+            AccountResponseDTO accountRes = bankAccountClient.createAccount(accountReq);
+            bankAccountNo = accountRes.getAccountNo();
+            logger.info("Automatically created bank account {} for customer {}", bankAccountNo, createdCustomer.getId());
+        } catch (Exception ex) {
+            logger.error("Failed to automatically create bank account: {}", ex.getMessage());
+            // We proceed anyway, customer is created.
+        }
+
         // Create credentials in auth-service
         UserCredential credential = new UserCredential();
         credential.setLoginId(request.getSsnId());
@@ -147,7 +171,7 @@ public class AuthServiceImpl implements AuthService {
         response.setCustomerName(request.getFirstName() + " " + request.getLastName());
         response.setEmail(request.getEmail());
         response.setSsnId(request.getSsnId());
-        response.setAccountNo(createdCustomer.getBankAccountNo());
+        response.setAccountNo(bankAccountNo != null ? bankAccountNo : createdCustomer.getBankAccountNo());
 
         logger.info("Customer registered successfully: {} (ID: {})", response.getCustomerName(), createdCustomer.getId());
         return response;
