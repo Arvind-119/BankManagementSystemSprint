@@ -146,22 +146,24 @@ public class AuthServiceImpl implements AuthService {
             return response;
         }
 
-        // Create default bank account automatically
-        String bankAccountNo = null;
+        // Create default bank account — this is MANDATORY, not optional
+        String bankAccountNo;
         try {
             AccountRequestDTO accountReq = new AccountRequestDTO();
             accountReq.setCustomerId(createdCustomer.getId());
             accountReq.setAccountType("SAVINGS");
             accountReq.setBranchName("Main Branch");
             accountReq.setIfscCode("BANK0000001");
-            accountReq.setInitialDeposit(request.getInitialDeposit() != null ? request.getInitialDeposit() : java.math.BigDecimal.ZERO);
-            
+            accountReq.setInitialDeposit(java.math.BigDecimal.ZERO);
+
             AccountResponseDTO accountRes = bankAccountClient.createAccount(accountReq);
             bankAccountNo = accountRes.getAccountNo();
-            logger.info("Automatically created bank account {} for customer {}", bankAccountNo, createdCustomer.getId());
+            logger.info("Created bank account {} for customer {}", bankAccountNo, createdCustomer.getId());
         } catch (Exception ex) {
-            logger.error("Failed to automatically create bank account: {}", ex.getMessage());
-            // We proceed anyway, customer is created.
+            logger.error("Failed to create bank account for customer {}: {}", createdCustomer.getId(), ex.getMessage());
+            response.setSuccess(false);
+            response.setMessage("Registration failed: could not create bank account. Please ensure all services are running and try again.");
+            return response;
         }
 
         // Create credentials in auth-service
@@ -179,7 +181,7 @@ public class AuthServiceImpl implements AuthService {
         response.setCustomerName(request.getFirstName() + " " + request.getLastName());
         response.setEmail(request.getEmail());
         response.setSsnId(request.getSsnId());
-        response.setAccountNo(bankAccountNo != null ? bankAccountNo : createdCustomer.getBankAccountNo());
+        response.setAccountNo(bankAccountNo);
 
         logger.info("Customer registered successfully: {} (ID: {})", response.getCustomerName(), createdCustomer.getId());
         return response;

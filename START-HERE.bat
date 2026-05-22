@@ -12,7 +12,7 @@ echo IMPORTANT: In EVERY terminal, first run this to set Maven path:
 echo   $env:PATH = "C:\Users\arvin\tools\apache-maven-3.9.6\bin;$env:PATH"
 echo.
 echo =====================================================
-echo   START SERVICES IN THIS ORDER (7 terminals needed)
+echo   START SERVICES IN THIS ORDER (6 terminals needed)
 echo =====================================================
 echo.
 echo TERMINAL 1 - Eureka Server (START FIRST, wait 20 sec):
@@ -42,13 +42,7 @@ echo   cd c:\Users\arvin\Documents\BankManagementSystemSprint\auth-service
 echo   mvn spring-boot:run
 echo   (Seeds default manager: manager1 / manager123)
 echo.
-echo TERMINAL 6 - Employee Service (port 8082, optional):
-echo   $env:PATH = "C:\Users\arvin\tools\apache-maven-3.9.6\bin;$env:PATH"
-echo   cd c:\Users\arvin\Documents\BankManagementSystemSprint\employee-service
-echo   mvn spring-boot:run
-echo   (Note: Employee management has been removed from UI)
-echo.
-echo TERMINAL 7 - Angular Frontend:
+echo TERMINAL 6 - Angular Frontend:
 echo   cd c:\Users\arvin\Documents\BankManagementSystemSprint\bank-management-ui
 echo   npm start
 echo.

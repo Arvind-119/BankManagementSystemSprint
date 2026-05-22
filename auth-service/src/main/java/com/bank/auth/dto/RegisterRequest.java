@@ -23,13 +23,11 @@ public class RegisterRequest {
     @Email(message = "Email should be valid")
     private String email;
 
-    @NotBlank(message = "Contact number is required")
     private String contact;
 
     @NotBlank(message = "Password is required")
     private String password;
 
-    @NotBlank(message = "Address is required")
     private String address;
 
     // Optional fields
@@ -38,7 +36,6 @@ public class RegisterRequest {
     private LocalDate dateOfBirth;
     private String gender;
     private String maritalStatus;
-    private java.math.BigDecimal initialDeposit;
 
     public RegisterRequest() {}
 
@@ -78,7 +75,4 @@ public class RegisterRequest {
 
     public String getMaritalStatus() { return maritalStatus; }
     public void setMaritalStatus(String maritalStatus) { this.maritalStatus = maritalStatus; }
-
-    public java.math.BigDecimal getInitialDeposit() { return initialDeposit; }
-    public void setInitialDeposit(java.math.BigDecimal initialDeposit) { this.initialDeposit = initialDeposit; }
 }

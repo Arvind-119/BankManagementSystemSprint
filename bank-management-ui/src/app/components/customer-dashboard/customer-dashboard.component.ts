@@ -60,8 +60,7 @@ import { SessionUser } from '../../models/auth.model';
             <div class="balance-hero">
               <div class="bh-label">Available Balance</div>
               <div class="bh-amount">₹{{ formatINR(account?.balance || 0) }}</div>
-              <div class="bh-account" *ngIf="account">{{ account.accountNo }} · <span class="status-active">● Active</span></div>
-              <div class="bh-account" *ngIf="!account"><span class="status-warn">No account linked yet. Contact your branch manager.</span></div>
+              <div class="bh-account">{{ account?.accountNo }} · <span class="status-active">● Active</span></div>
             </div>
             <div class="quick-actions">
               <button class="qa-card" (click)="showSection('deposit')"><span class="qa-icon">💵</span><span>Deposit</span></button>
@@ -247,10 +246,10 @@ export class CustomerDashboardComponent implements OnInit {
       this.accountService.getByCustomer(this.user.linkedCustomerId).subscribe({
         next: (accounts) => {
           if (accounts && accounts.length > 0) {
-            this.account = accounts[0]; // primary account
+            this.account = accounts[0];
           }
         },
-        error: () => { /* no account yet */ }
+        error: () => {}
       });
     }
   }
@@ -271,32 +270,29 @@ export class CustomerDashboardComponent implements OnInit {
   }
 
   doDeposit(): void {
-    if (!this.account) { this.showTxn('No account linked.', true); return; }
     if (!this.depositAmount || this.depositAmount < 100) { this.showTxn('Minimum deposit amount is ₹100.', true); return; }
     this.opLoading = true;
-    this.accountService.deposit(this.account.accountNo, { amount: this.depositAmount, description: 'Self deposit' }).subscribe({
+    this.accountService.deposit(this.account!.accountNo, { amount: this.depositAmount, description: 'Self deposit' }).subscribe({
       next: (res) => { this.account = res; this.depositAmount = null; this.opLoading = false; this.showTxn('✅ ₹' + this.formatINR(res.balance) + ' — Deposit successful! New balance: ₹' + this.formatINR(res.balance), false); },
       error: (err) => { this.opLoading = false; this.showTxn(err.error?.message || 'Deposit failed.', true); }
     });
   }
 
   doWithdraw(): void {
-    if (!this.account) { this.showTxn('No account linked.', true); return; }
     if (!this.withdrawAmount || this.withdrawAmount < 1000) { this.showTxn('Minimum withdrawal amount is ₹1,000.', true); return; }
     this.opLoading = true;
-    this.accountService.withdraw(this.account.accountNo, { amount: this.withdrawAmount, description: 'Self withdrawal' }).subscribe({
+    this.accountService.withdraw(this.account!.accountNo, { amount: this.withdrawAmount, description: 'Self withdrawal' }).subscribe({
       next: (res) => { this.account = res; this.withdrawAmount = null; this.opLoading = false; this.showTxn('✅ Withdrawal successful! New balance: ₹' + this.formatINR(res.balance), false); },
       error: (err) => { this.opLoading = false; this.showTxn(err.error?.message || 'Withdrawal failed. Check minimum balance rules.', true); }
     });
   }
 
   doTransfer(): void {
-    if (!this.account) { this.showTxn('No account linked.', true); return; }
     if (!this.transferTo.trim()) { this.showTxn('Please enter destination account number.', true); return; }
     if (!this.transferAmount || this.transferAmount <= 0) { this.showTxn('Please enter a valid amount.', true); return; }
     this.opLoading = true;
     this.accountService.transfer({
-      fromAccountNo: this.account.accountNo,
+      fromAccountNo: this.account!.accountNo,
       toAccountNo: this.transferTo.trim(),
       amount: this.transferAmount,
       description: this.transferDesc || 'Fund transfer'

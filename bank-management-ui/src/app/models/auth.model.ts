@@ -28,7 +28,6 @@ export interface RegisterRequest {
   dateOfBirth?: string;
   gender?: string;
   maritalStatus?: string;
-  initialDeposit?: number;
 }
 
 export interface RegisterResponse {

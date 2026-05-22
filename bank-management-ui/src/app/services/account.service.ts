@@ -20,7 +20,7 @@ export class AccountService {
   }
 
   getByAccountNo(accountNo: string): Observable<BankAccount> {
-    return this.http.get<BankAccount>(`${this.apiUrl}/account/${accountNo}`);
+    return this.http.get<BankAccount>(`${this.apiUrl}/${accountNo}`);
   }
 
   create(account: AccountRequest): Observable<BankAccount> {
@@ -36,11 +36,11 @@ export class AccountService {
   }
 
   deposit(accountNo: string, data: DepositWithdraw): Observable<BankAccount> {
-    return this.http.post<BankAccount>(`${this.apiUrl}/${accountNo}/deposit`, data);
+    return this.http.put<BankAccount>(`${this.apiUrl}/${accountNo}/deposit`, data);
   }
 
   withdraw(accountNo: string, data: DepositWithdraw): Observable<BankAccount> {
-    return this.http.post<BankAccount>(`${this.apiUrl}/${accountNo}/withdraw`, data);
+    return this.http.put<BankAccount>(`${this.apiUrl}/${accountNo}/withdraw`, data);
   }
 
   transfer(data: Transfer): Observable<any> {
