@@ -3,7 +3,7 @@ import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { CustomerListComponent } from './components/customer/customer-list/customer-list.component';
 import { CustomerFormComponent } from './components/customer/customer-form/customer-form.component';
 import { AccountListComponent } from './components/account/account-list/account-list.component';
-import { AccountFormComponent } from './components/account/account-form/account-form.component';
+
 import { TransactionListComponent } from './components/transaction/transaction-list/transaction-list.component';
 import { LoginComponent } from './components/auth/login/login.component';
 import { RegisterComponent } from './components/auth/register/register.component';
@@ -24,7 +24,7 @@ export const routes: Routes = [
   { path: 'customers/new', component: CustomerFormComponent, canActivate: [authGuard], data: { role: 'manager' } },
   { path: 'customers/edit/:id', component: CustomerFormComponent, canActivate: [authGuard], data: { role: 'manager' } },
   { path: 'accounts', component: AccountListComponent, canActivate: [authGuard], data: { role: 'manager' } },
-  { path: 'accounts/new', component: AccountFormComponent, canActivate: [authGuard], data: { role: 'manager' } },
+
   { path: 'transactions', component: TransactionListComponent, canActivate: [authGuard], data: { role: 'manager' } },
 
   // Fallback

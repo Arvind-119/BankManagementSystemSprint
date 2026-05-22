@@ -111,10 +111,6 @@ import { Customer } from '../../models/customer.model';
               <span class="action-icon">👤</span>
               <span>Add Customer</span>
             </a>
-            <a routerLink="/accounts/new" class="action-btn" id="action-create-account">
-              <span class="action-icon">🏦</span>
-              <span>Create Account</span>
-            </a>
             <a routerLink="/transactions" class="action-btn" id="action-view-txn">
               <span class="action-icon">💳</span>
               <span>View Txns</span>

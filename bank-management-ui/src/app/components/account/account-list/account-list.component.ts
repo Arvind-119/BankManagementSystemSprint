@@ -17,8 +17,6 @@ import { BankAccount } from '../../../models/account.model';
           <p>Manage all bank accounts</p>
         </div>
         <div class="header-actions">
-
-          <a routerLink="/accounts/new" class="btn btn-primary" id="btn-create-account">+ Create Account</a>
         </div>
       </div>
 
