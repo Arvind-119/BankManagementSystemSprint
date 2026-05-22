@@ -7,6 +7,7 @@ import { TransactionService } from '../../services/transaction.service';
 import { AuthService } from '../../services/auth.service';
 import { Transaction } from '../../models/transaction.model';
 import { SessionUser } from '../../models/auth.model';
+import { Customer } from '../../models/customer.model';
 
 @Component({
   selector: 'app-dashboard',
@@ -121,6 +122,40 @@ import { SessionUser } from '../../models/auth.model';
           </div>
         </div>
       </div>
+
+      <div class="recent-customers glass-card" style="margin-top: 24px;">
+        <div class="section-header">
+          <h3>Recent Customers</h3>
+          <a routerLink="/customers" class="view-all">View All →</a>
+        </div>
+        <div class="table-container">
+          <table *ngIf="recentCustomers.length > 0">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>SSN ID</th>
+                <th>Email</th>
+                <th>Bank Account No</th>
+                <th>PAN No</th>
+                <th>Contact</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let c of recentCustomers">
+                <td class="name-cell"><div class="avatar-sm">{{ c.firstName?.charAt(0) }}{{ c.lastName?.charAt(0) }}</div><span>{{ c.firstName }} {{ c.lastName }}</span></td>
+                <td><span class="badge badge-info">{{ c.snnId }}</span></td>
+                <td>{{ c.email }}</td>
+                <td><code>{{ c.bankAccountNo || '—' }}</code></td>
+                <td><code>{{ c.panNo || '—' }}</code></td>
+                <td>{{ c.contact || '—' }}</td>
+              </tr>
+            </tbody>
+          </table>
+          <div *ngIf="recentCustomers.length === 0" class="empty-state">
+            <p>No customers registered yet.</p>
+          </div>
+        </div>
+      </div>
     </div>
   `,
   styles: [`
@@ -214,6 +249,11 @@ import { SessionUser } from '../../models/auth.model';
     .action-btn:hover { background: rgba(102,126,234,0.15); border-color: rgba(102,126,234,0.3); transform: translateY(-2px); }
     .action-icon { font-size: 1.5rem; }
 
+    .name-cell { display: flex; align-items: center; gap: 10px; }
+    .avatar-sm { width: 30px; height: 30px; border-radius: 50%; background: linear-gradient(135deg, #667eea, #764ba2); display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; color: white; flex-shrink: 0; }
+    code { background: rgba(255,255,255,0.06); padding: 3px 8px; border-radius: 4px; font-size: 12px; font-family: 'JetBrains Mono', monospace; }
+    .badge-info { background: rgba(102,126,234,0.2); color: #667eea; }
+
     @media (max-width: 1200px) { .stats-grid { grid-template-columns: repeat(2, 1fr); } .dashboard-content { grid-template-columns: 1fr; } }
     @media (max-width: 768px) { .stats-grid { grid-template-columns: 1fr; } }
   `]
@@ -225,6 +265,7 @@ export class DashboardComponent implements OnInit {
   transactionCount = 0;
   totalBalance = 0;
   recentTransactions: Transaction[] = [];
+  recentCustomers: Customer[] = [];
 
   constructor(
     private customerService: CustomerService,
@@ -237,7 +278,10 @@ export class DashboardComponent implements OnInit {
     this.user = this.authService.getSession();
 
     this.customerService.getAll().subscribe({
-      next: (data) => this.customerCount = data.length,
+      next: (data) => {
+        this.customerCount = data.length;
+        this.recentCustomers = data.slice(-5).reverse();
+      },
       error: () => this.customerCount = 0
     });
     this.accountService.getAll().subscribe({
