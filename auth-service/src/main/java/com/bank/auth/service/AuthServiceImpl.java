@@ -140,6 +140,10 @@ public class AuthServiceImpl implements AuthService {
                 response.setMessage("A customer with this email already exists.");
             } else if (ex.getMessage() != null && ex.getMessage().contains("SSN")) {
                 response.setMessage("A customer with this SSN ID already exists.");
+            } else if (ex.getMessage() != null && ex.getMessage().contains("PAN")) {
+                response.setMessage("A customer with this PAN number already exists.");
+            } else if (ex.getMessage() != null && ex.getMessage().contains("Aadhar")) {
+                response.setMessage("A customer with this Aadhar number already exists.");
             } else {
                 response.setMessage("Failed to register customer. Please try again.");
             }

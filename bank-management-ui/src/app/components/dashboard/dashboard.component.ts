@@ -254,6 +254,14 @@ import { Customer } from '../../models/customer.model';
 
     @media (max-width: 1200px) { .stats-grid { grid-template-columns: repeat(2, 1fr); } .dashboard-content { grid-template-columns: 1fr; } }
     @media (max-width: 768px) { .stats-grid { grid-template-columns: 1fr; } }
+    @media (max-width: 576px) {
+      .glass-card { padding: 16px; }
+      .actions-grid { grid-template-columns: 1fr; }
+      .dashboard-header h2 { font-size: 1.5rem; }
+      .stat-card { padding: 16px; gap: 12px; }
+      .stat-icon { width: 44px; height: 44px; }
+      .stat-info h3 { font-size: 1.4rem; }
+    }
   `]
 })
 export class DashboardComponent implements OnInit {

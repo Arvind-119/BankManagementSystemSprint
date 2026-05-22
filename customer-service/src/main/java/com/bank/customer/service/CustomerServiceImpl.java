@@ -32,6 +32,14 @@ public class CustomerServiceImpl implements CustomerService {
         if (customerRepository.existsByEmail(request.getEmail())) {
             throw new IllegalArgumentException("A customer with this email already exists.");
         }
+        // Check for duplicate PAN
+        if (request.getPanNo() != null && !request.getPanNo().trim().isEmpty() && customerRepository.existsByPanNo(request.getPanNo())) {
+            throw new IllegalArgumentException("A customer with this PAN already exists.");
+        }
+        // Check for duplicate Aadhar
+        if (request.getAadharNo() != null && !request.getAadharNo().trim().isEmpty() && customerRepository.existsByAadharNo(request.getAadharNo())) {
+            throw new IllegalArgumentException("A customer with this Aadhar already exists.");
+        }
 
         Customer customer = mapToEntity(request);
         Customer savedCustomer = customerRepository.save(customer);

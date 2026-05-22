@@ -98,6 +98,13 @@ import { Transaction } from '../../../models/transaction.model';
     .status-pending { background: rgba(247,151,30,0.15); color: #ffd200; }
     .empty-state { padding: 40px; text-align: center; }
     .empty-state p { color: rgba(255,255,255,0.4); }
+
+    @media (max-width: 576px) {
+      .page-header { flex-direction: column; align-items: flex-start; gap: 8px; }
+      .table-toolbar { flex-direction: column; align-items: flex-start; gap: 12px; }
+      .search-filter { width: 100%; }
+      .search-filter input { width: 100%; }
+    }
   `]
 })
 export class TransactionListComponent implements OnInit {

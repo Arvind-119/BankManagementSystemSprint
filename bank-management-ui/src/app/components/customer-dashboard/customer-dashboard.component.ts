@@ -269,7 +269,20 @@ import { Transaction } from '../../models/transaction.model';
     .type-withdrawal { background: rgba(255,65,108,0.2); color: #ff416c; }
     .type-transfer { background: rgba(102,126,234,0.2); color: #667eea; }
 
-    @media (max-width: 900px) { .quick-actions { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 900px) { 
+      .quick-actions { grid-template-columns: 1fr 1fr; }
+      .cust-content { padding: 20px; }
+      .cust-topbar { padding: 0 16px; }
+    }
+    @media (max-width: 576px) { 
+      .quick-actions { grid-template-columns: 1fr; } 
+      .details-grid { grid-template-columns: 1fr; }
+      .balance-hero { padding: 20px; }
+      .bh-amount { font-size: 32px; }
+      .op-card { padding: 16px; }
+      .balance-display { padding: 24px 16px; }
+      .bd-amount { font-size: 36px; }
+    }
   `]
 })
 export class CustomerDashboardComponent implements OnInit {
@@ -385,7 +398,9 @@ export class CustomerDashboardComponent implements OnInit {
     });
   }
 
-
+  refreshBalance(): void {
+    this.loadAccount();
+  }
 
   signOut(): void {
     this.authService.logout();

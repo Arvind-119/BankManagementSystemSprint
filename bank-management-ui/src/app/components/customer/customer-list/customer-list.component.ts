@@ -135,6 +135,13 @@ import { BankAccount } from '../../../models/account.model';
       display: flex;
       gap: 8px;
     }
+
+    @media (max-width: 576px) {
+      .table-toolbar { flex-direction: column; align-items: flex-start; gap: 12px; }
+      .search-box { width: 100%; }
+      .search-box input { width: 100%; }
+      .action-buttons { flex-direction: column; }
+    }
   `]
 })
 export class CustomerListComponent implements OnInit {

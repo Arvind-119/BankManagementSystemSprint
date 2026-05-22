@@ -125,7 +125,7 @@ import { AuthService } from '../../../services/auth.service';
           </div>
 
           <div class="form-actions">
-            <button type="submit" class="btn btn-primary" [disabled]="customerForm.invalid || isSubmitting" id="submit-customer-btn">
+            <button type="submit" class="btn btn-primary" [disabled]="customerForm.invalid || isSubmitting" id="submit-customer-btn" [class.shake-animation]="hasError">
               {{ isSubmitting ? 'Saving...' : (isEdit ? '✓ Update Customer' : '+ Create Customer') }}
             </button>
             <a routerLink="/customers" class="btn btn-outline" id="cancel-customer-btn">Cancel</a>
@@ -144,6 +144,12 @@ import { AuthService } from '../../../services/auth.service';
     select.form-control { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23888' d='M6 8L1 3h10z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; }
     select.form-control option { background: #1a1a2e; color: #fff; }
     .readonly-field { padding: 10px 14px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; color: rgba(255,255,255,0.5); font-family: 'JetBrains Mono', monospace; font-size: 13px; }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-5px); }
+      40%, 80% { transform: translateX(5px); }
+    }
+    .shake-animation { animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both; }
   `]
 })
 export class CustomerFormComponent implements OnInit {
@@ -153,6 +159,7 @@ export class CustomerFormComponent implements OnInit {
   toastMessage = '';
   toastType = 'success';
   isSubmitting = false;
+  hasError = false;
   originalBankAccountNo = '';
 
   constructor(
@@ -242,11 +249,13 @@ export class CustomerFormComponent implements OnInit {
             setTimeout(() => this.router.navigate(['/customers']), 1500);
           } else {
             this.showToast(res.message || 'Failed to create customer', 'error');
+            this.triggerErrorAnimation();
           }
         },
         error: (err) => {
           this.isSubmitting = false;
           this.showToast(err.error?.message || 'Failed to create customer', 'error');
+          this.triggerErrorAnimation();
         }
       });
     } else {
@@ -261,6 +270,7 @@ export class CustomerFormComponent implements OnInit {
           this.isSubmitting = false;
           console.error('Error updating customer:', err);
           this.showToast(err.error?.message || 'Failed to update customer', 'error');
+          this.triggerErrorAnimation();
         }
       });
     }
@@ -275,5 +285,10 @@ export class CustomerFormComponent implements OnInit {
     this.toastMessage = message;
     this.toastType = type;
     setTimeout(() => this.toastMessage = '', 3000);
+  }
+
+  triggerErrorAnimation(): void {
+    this.hasError = true;
+    setTimeout(() => this.hasError = false, 400);
   }
 }
