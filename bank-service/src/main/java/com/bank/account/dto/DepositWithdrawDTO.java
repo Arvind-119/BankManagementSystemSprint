@@ -7,6 +7,8 @@ import java.math.BigDecimal;
 public class DepositWithdrawDTO {
 
     @NotNull(message = "Amount is required")
+    @jakarta.validation.constraints.Positive(message = "Amount must be positive")
+    @jakarta.validation.constraints.Digits(integer = 10, fraction = 2, message = "Amount out of bounds")
     private BigDecimal amount;
 
     private String description;

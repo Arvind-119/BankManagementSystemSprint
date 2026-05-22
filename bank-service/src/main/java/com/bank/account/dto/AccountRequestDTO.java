@@ -17,6 +17,8 @@ public class AccountRequestDTO {
 
     private String ifscCode;
 
+    @jakarta.validation.constraints.PositiveOrZero(message = "Initial deposit cannot be negative")
+    @jakarta.validation.constraints.Digits(integer = 10, fraction = 2, message = "Amount out of bounds")
     private BigDecimal initialDeposit;
 
     // No-arg constructor

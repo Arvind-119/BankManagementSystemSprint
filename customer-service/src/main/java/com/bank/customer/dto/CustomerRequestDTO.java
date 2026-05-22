@@ -20,6 +20,8 @@ public class CustomerRequestDTO {
     @Email(message = "Email should be valid")
     private String email;
 
+    @jakarta.validation.constraints.Min(value = 0, message = "Age cannot be negative")
+    @jakarta.validation.constraints.Max(value = 150, message = "Age must be less than 150")
     private Integer age;
 
     private LocalDate dateOfBirth;
