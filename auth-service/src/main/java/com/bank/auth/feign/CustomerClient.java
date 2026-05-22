@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
 
 @FeignClient(name = "customer-service", url = "http://localhost:8081")
 public interface CustomerClient {
@@ -24,4 +25,7 @@ public interface CustomerClient {
 
     @PutMapping("/api/v1/customers/{id}")
     CustomerDTO updateCustomer(@PathVariable("id") Long id, @RequestBody CustomerCreateDTO request);
+
+    @DeleteMapping("/api/v1/customers/{id}")
+    void deleteCustomer(@PathVariable("id") Long id);
 }

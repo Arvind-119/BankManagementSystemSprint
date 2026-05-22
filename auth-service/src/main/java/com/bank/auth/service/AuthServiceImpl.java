@@ -181,6 +181,16 @@ public class AuthServiceImpl implements AuthService {
             logger.info("Updated customer {} with bank account {}", createdCustomer.getId(), bankAccountNo);
         } catch (Exception ex) {
             logger.error("Failed to create bank account for customer {}: {}", createdCustomer.getId(), ex.getMessage());
+            
+            // Compensating transaction: Delete the partially created customer
+            try {
+                logger.info("Initiating compensation: Deleting customer {} from customer-service", createdCustomer.getId());
+                customerClient.deleteCustomer(createdCustomer.getId());
+                logger.info("Compensation successful");
+            } catch (Exception compEx) {
+                logger.error("Failed compensation: Could not delete customer {}: {}", createdCustomer.getId(), compEx.getMessage());
+            }
+
             response.setSuccess(false);
             response.setMessage("Registration failed: could not create bank account. Please ensure all services are running and try again.");
             return response;

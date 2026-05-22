@@ -6,7 +6,6 @@ Microservices-based bank management application with Spring Boot backends and an
 
 - **eureka-server** (8761) — Service discovery
 - **customer-service** (8081) — Customer CRUD
-- **employee-service** (8082) — Employee CRUD
 - **bank-service** (8083) — Accounts, deposits, withdrawals, transfers
 - **transaction-service** (8084) — Transaction audit log
 - **bank-management-ui** (4200) — Angular 17 SPA
@@ -22,7 +21,7 @@ Microservices-based bank management application with Spring Boot backends and an
 See `START-HERE.bat` for startup order and URLs.
 
 1. Start **eureka-server** and wait until it is ready.
-2. Start **customer-service**, **employee-service**, **bank-service**, **transaction-service**.
+2. Start **customer-service**, **bank-service**, **transaction-service**.
 3. In `bank-management-ui`: `npm install` then `npm start`.
 4. Open http://localhost:4200
 

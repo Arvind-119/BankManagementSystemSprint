@@ -73,7 +73,8 @@ import { Customer } from '../../models/customer.model';
               <thead>
                 <tr>
                   <th>Transaction ID</th>
-                  <th>Account</th>
+                  <th>From</th>
+                  <th>To</th>
                   <th>Type</th>
                   <th>Amount</th>
                   <th>Status</th>
@@ -82,7 +83,8 @@ import { Customer } from '../../models/customer.model';
               <tbody>
                 <tr *ngFor="let t of recentTransactions">
                   <td class="txn-id">{{ t.transactionId | slice:0:12 }}...</td>
-                  <td>{{ t.accountNo }}</td>
+                  <td>{{ t.fromAccount || t.accountNo }}</td>
+                  <td>{{ t.toAccount || '—' }}</td>
                   <td>
                     <span class="badge" [ngClass]="{
                       'badge-deposit': t.transactionType === 'DEPOSIT',

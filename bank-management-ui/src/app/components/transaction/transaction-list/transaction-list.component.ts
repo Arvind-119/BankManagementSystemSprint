@@ -28,7 +28,8 @@ import { Transaction } from '../../../models/transaction.model';
             <thead>
               <tr>
                 <th>Transaction ID</th>
-                <th>Account No</th>
+                <th>From Account</th>
+                <th>To Account</th>
                 <th>Type</th>
                 <th>Amount (₹)</th>
                 <th>Balance After</th>
@@ -39,7 +40,8 @@ import { Transaction } from '../../../models/transaction.model';
             <tbody>
               <tr *ngFor="let txn of filteredTransactions" class="table-row">
                 <td class="mono">{{ txn.transactionId | slice:0:8 }}...</td>
-                <td class="mono">{{ txn.accountNo }}</td>
+                <td class="mono">{{ txn.fromAccount || txn.accountNo }}</td>
+                <td class="mono">{{ txn.toAccount || '—' }}</td>
                 <td>
                   <span class="type-badge" [ngClass]="{
                     'type-deposit': txn.transactionType === 'DEPOSIT',
@@ -107,7 +109,7 @@ export class TransactionListComponent implements OnInit {
 
   ngOnInit(): void {
     this.transactionService.getAll().subscribe({
-      next: (data) => { this.transactions = data; this.filteredTransactions = data; },
+      next: (data) => { const reversed = data.reverse(); this.transactions = reversed; this.filteredTransactions = reversed; },
       error: () => {}
     });
   }

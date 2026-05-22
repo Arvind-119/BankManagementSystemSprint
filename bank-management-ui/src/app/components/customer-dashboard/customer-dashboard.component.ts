@@ -6,6 +6,8 @@ import { AuthService } from '../../services/auth.service';
 import { AccountService } from '../../services/account.service';
 import { BankAccount } from '../../models/account.model';
 import { SessionUser } from '../../models/auth.model';
+import { TransactionService } from '../../services/transaction.service';
+import { Transaction } from '../../models/transaction.model';
 
 @Component({
   selector: 'app-customer-dashboard',
@@ -30,6 +32,7 @@ import { SessionUser } from '../../models/auth.model';
           <button class="nav-item" [class.active]="activeSection === 'withdraw'" (click)="showSection('withdraw')" id="nav-withdraw">💸 Withdraw</button>
           <button class="nav-item" [class.active]="activeSection === 'transfer'" (click)="showSection('transfer')" id="nav-transfer">🔄 Transfer</button>
           <button class="nav-item" [class.active]="activeSection === 'balance'" (click)="showSection('balance')" id="nav-balance">💰 Check Balance</button>
+          <button class="nav-item" [class.active]="activeSection === 'transactions'" (click)="showSection('transactions')" id="nav-transactions">📜 Transactions</button>
         </nav>
         <div class="sidebar-footer">
           <div class="footer-card">🔒<span>Secured Banking</span><small>256-bit Encryption</small></div>
@@ -126,6 +129,57 @@ import { SessionUser } from '../../models/auth.model';
             </div>
             <button class="btn-action btn-outline" (click)="refreshBalance()" id="btn-refresh" style="margin-top:20px;">🔄 Refresh Balance</button>
           </div>
+
+          <!-- TRANSACTIONS SECTION -->
+          <div *ngIf="activeSection === 'transactions'" class="section" id="section-transactions">
+            <h2>Transactions</h2>
+            <p class="section-sub">View your account transaction history</p>
+            <div class="table-container glass-card" style="margin-top: 16px;">
+              <table style="width: 100%; border-collapse: collapse; text-align: left;" *ngIf="transactions.length > 0">
+                <thead>
+                  <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);">
+                    <th style="padding: 12px; color: rgba(255,255,255,0.5);">Txn ID</th>
+                    <th style="padding: 12px; color: rgba(255,255,255,0.5);">Details</th>
+                    <th style="padding: 12px; color: rgba(255,255,255,0.5);">Amount</th>
+                    <th style="padding: 12px; color: rgba(255,255,255,0.5);">Balance After</th>
+                    <th style="padding: 12px; color: rgba(255,255,255,0.5);">Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let txn of transactions" style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                    <td style="padding: 12px; font-family: monospace;">{{ txn.transactionId | slice:0:8 }}</td>
+                    <td style="padding: 12px;">
+                      <div *ngIf="txn.transactionType === 'TRANSFER'">
+                        <span class="type-badge type-transfer">Transfer</span>
+                        <div style="font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 4px;">Sent to: {{ txn.toAccount }}</div>
+                      </div>
+                      <div *ngIf="txn.transactionType === 'DEPOSIT' && txn.fromAccount">
+                        <span class="type-badge type-deposit">Received</span>
+                        <div style="font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 4px;">From: {{ txn.fromAccount }}</div>
+                      </div>
+                      <div *ngIf="txn.transactionType === 'DEPOSIT' && !txn.fromAccount">
+                        <span class="type-badge type-deposit">Deposit</span>
+                      </div>
+                      <div *ngIf="txn.transactionType === 'WITHDRAWAL'">
+                        <span class="type-badge type-withdrawal">Withdrawal</span>
+                      </div>
+                    </td>
+                    <td style="padding: 12px;" [ngClass]="{
+                      'amount-credit': txn.transactionType === 'DEPOSIT',
+                      'amount-debit': txn.transactionType === 'WITHDRAWAL' || txn.transactionType === 'TRANSFER'
+                    }">
+                      {{ txn.transactionType === 'DEPOSIT' ? '+' : '-' }}₹{{ txn.amount | number:'1.2-2' }}
+                    </td>
+                    <td style="padding: 12px;">₹{{ txn.balanceAfterTransaction | number:'1.2-2' }}</td>
+                    <td style="padding: 12px;">{{ txn.transactionDate | date:'medium' }}</td>
+                  </tr>
+                </tbody>
+              </table>
+              <div *ngIf="transactions.length === 0" style="padding: 24px; text-align: center; color: rgba(255,255,255,0.5);">
+                No transactions found.
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -208,6 +262,12 @@ import { SessionUser } from '../../models/auth.model';
     .detail-item { padding: 16px 20px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; }
     .dl { display: block; font-size: 11px; color: rgba(255,255,255,0.35); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
     .dv { font-size: 14px; color: #fff; font-weight: 600; }
+    .glass-card { background: rgba(255,255,255,0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 24px; }
+
+    .type-badge { padding: 4px 10px; border-radius: 6px; font-size: 0.7rem; font-weight: 600; text-transform: uppercase; display: inline-block; }
+    .type-deposit { background: rgba(17,153,142,0.2); color: #38ef7d; }
+    .type-withdrawal { background: rgba(255,65,108,0.2); color: #ff416c; }
+    .type-transfer { background: rgba(102,126,234,0.2); color: #667eea; }
 
     @media (max-width: 900px) { .quick-actions { grid-template-columns: 1fr 1fr; } }
   `]
@@ -216,6 +276,7 @@ export class CustomerDashboardComponent implements OnInit {
   user: SessionUser | null = null;
   account: BankAccount | null = null;
   activeSection = 'home';
+  transactions: Transaction[] = [];
 
   depositAmount: number | null = null;
   withdrawAmount: number | null = null;
@@ -229,6 +290,7 @@ export class CustomerDashboardComponent implements OnInit {
   constructor(
     private authService: AuthService,
     private accountService: AccountService,
+    private transactionService: TransactionService,
     private router: Router
   ) { }
 
@@ -247,8 +309,18 @@ export class CustomerDashboardComponent implements OnInit {
         next: (accounts) => {
           if (accounts && accounts.length > 0) {
             this.account = accounts[0];
+            this.loadTransactions();
           }
         },
+        error: () => { }
+      });
+    }
+  }
+
+  loadTransactions(): void {
+    if (this.account) {
+      this.transactionService.getByAccountNo(this.account.accountNo).subscribe({
+        next: (txns) => { this.transactions = txns; },
         error: () => { }
       });
     }
@@ -263,6 +335,9 @@ export class CustomerDashboardComponent implements OnInit {
     this.transferAmount = null;
     this.transferDesc = '';
     document.body.classList.remove('sidebar-open');
+
+    // Always reload account and transactions freshly when switching tabs
+    this.loadAccount();
   }
 
   toggleSidebar(): void {
@@ -273,7 +348,7 @@ export class CustomerDashboardComponent implements OnInit {
     if (!this.depositAmount || this.depositAmount < 100) { this.showTxn('Minimum deposit amount is ₹100.', true); return; }
     this.opLoading = true;
     this.accountService.deposit(this.account!.accountNo, { amount: this.depositAmount, description: 'Self deposit' }).subscribe({
-      next: (res) => { this.account = res; this.depositAmount = null; this.opLoading = false; this.showTxn('✅ ₹' + this.formatINR(res.balance) + ' — Deposit successful! New balance: ₹' + this.formatINR(res.balance), false); },
+      next: (res) => { this.account = res; this.depositAmount = null; this.opLoading = false; this.loadTransactions(); this.showTxn('✅ ₹' + this.formatINR(res.balance) + ' — Deposit successful! New balance: ₹' + this.formatINR(res.balance), false); },
       error: (err) => { this.opLoading = false; this.showTxn(err.error?.message || 'Deposit failed.', true); }
     });
   }
@@ -282,7 +357,7 @@ export class CustomerDashboardComponent implements OnInit {
     if (!this.withdrawAmount || this.withdrawAmount < 1000) { this.showTxn('Minimum withdrawal amount is ₹1,000.', true); return; }
     this.opLoading = true;
     this.accountService.withdraw(this.account!.accountNo, { amount: this.withdrawAmount, description: 'Self withdrawal' }).subscribe({
-      next: (res) => { this.account = res; this.withdrawAmount = null; this.opLoading = false; this.showTxn('✅ Withdrawal successful! New balance: ₹' + this.formatINR(res.balance), false); },
+      next: (res) => { this.account = res; this.withdrawAmount = null; this.opLoading = false; this.loadTransactions(); this.showTxn('✅ Withdrawal successful! New balance: ₹' + this.formatINR(res.balance), false); },
       error: (err) => { this.opLoading = false; this.showTxn(err.error?.message || 'Withdrawal failed. Check minimum balance rules.', true); }
     });
   }
@@ -303,6 +378,7 @@ export class CustomerDashboardComponent implements OnInit {
         this.transferAmount = null;
         this.transferDesc = '';
         this.opLoading = false;
+        this.loadTransactions();
         this.showTxn('✅ Transfer successful! New balance: ₹' + this.formatINR(res.balance), false);
       },
       error: (err) => { this.opLoading = false; this.showTxn(err.error?.message || 'Transfer failed.', true); }
