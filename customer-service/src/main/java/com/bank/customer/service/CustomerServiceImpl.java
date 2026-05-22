@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 
 @Service
 @Transactional
+@SuppressWarnings("null")
 public class CustomerServiceImpl implements CustomerService {
 
     private final CustomerRepository customerRepository;

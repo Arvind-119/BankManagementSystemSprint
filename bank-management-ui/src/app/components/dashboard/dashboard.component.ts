@@ -290,7 +290,7 @@ export class DashboardComponent implements OnInit {
             });
             this.recentCustomers.forEach(c => {
               if (!c.bankAccountNo && accountMap.has(c.id)) {
-                (c as any).bankAccountNo = accountMap.get(c.id)!;
+                c.bankAccountNo = accountMap.get(c.id)!;
               }
             });
           },

@@ -385,14 +385,7 @@ export class CustomerDashboardComponent implements OnInit {
     });
   }
 
-  refreshBalance(): void {
-    if (this.account) {
-      this.accountService.getByAccountNo(this.account.accountNo).subscribe({
-        next: (res) => { this.account = res; },
-        error: () => { }
-      });
-    }
-  }
+
 
   signOut(): void {
     this.authService.logout();
