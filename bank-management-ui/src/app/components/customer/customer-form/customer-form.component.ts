@@ -81,10 +81,10 @@ import { AuthService } from '../../../services/auth.service';
           </div>
 
           <h3 class="form-section-title">Banking Information</h3>
-          <div class="form-row">
-            <div class="form-group">
-              <label for="bankAccountNo">Bank Account No</label>
-              <input type="text" class="form-control" id="bankAccountNo" formControlName="bankAccountNo" placeholder="Auto-generated if empty">
+            <div class="form-row">
+            <div class="form-group" *ngIf="isEdit">
+              <label>Bank Account No</label>
+              <div class="readonly-field">{{ originalBankAccountNo || '—' }}</div>
             </div>
             <div class="form-group">
               <label for="aadharNo">Aadhaar Number</label>
@@ -143,6 +143,7 @@ import { AuthService } from '../../../services/auth.service';
     .form-section-title:first-of-type { margin-top: 0; }
     select.form-control { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23888' d='M6 8L1 3h10z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; }
     select.form-control option { background: #1a1a2e; color: #fff; }
+    .readonly-field { padding: 10px 14px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; color: rgba(255,255,255,0.5); font-family: 'JetBrains Mono', monospace; font-size: 13px; }
   `]
 })
 export class CustomerFormComponent implements OnInit {
@@ -152,6 +153,7 @@ export class CustomerFormComponent implements OnInit {
   toastMessage = '';
   toastType = 'success';
   isSubmitting = false;
+  originalBankAccountNo = '';
 
   constructor(
     private fb: FormBuilder,
@@ -171,7 +173,6 @@ export class CustomerFormComponent implements OnInit {
       address: [''],
       age: ['', [Validators.min(1), Validators.max(120)]],
       dateOfBirth: [''],
-      bankAccountNo: [''],
       aadharNo: ['', [Validators.pattern(/^\d{12}$/)]],
       panNo: ['', [Validators.pattern(/^[A-Za-z]{5}\d{4}[A-Za-z]$/)]],
       gender: [''],
@@ -198,12 +199,12 @@ export class CustomerFormComponent implements OnInit {
           address: customer.address,
           age: customer.age,
           dateOfBirth: customer.dateOfBirth,
-          bankAccountNo: customer.bankAccountNo,
           aadharNo: customer.aadharNo,
           panNo: customer.panNo,
           gender: customer.gender,
           maritalStatus: customer.maritalStatus
         });
+        this.originalBankAccountNo = customer.bankAccountNo || '';
       },
       error: (err) => {
         console.error('Error loading customer:', err);
@@ -249,7 +250,8 @@ export class CustomerFormComponent implements OnInit {
         }
       });
     } else {
-      this.customerService.update(this.customerId, formData).subscribe({
+      const updateData = { ...formData, bankAccountNo: this.originalBankAccountNo };
+      this.customerService.update(this.customerId, updateData).subscribe({
         next: () => {
           this.isSubmitting = false;
           this.showToast('Customer updated successfully', 'success');
@@ -258,7 +260,7 @@ export class CustomerFormComponent implements OnInit {
         error: (err) => {
           this.isSubmitting = false;
           console.error('Error updating customer:', err);
-          this.showToast('Failed to update customer', 'error');
+          this.showToast(err.error?.message || 'Failed to update customer', 'error');
         }
       });
     }
