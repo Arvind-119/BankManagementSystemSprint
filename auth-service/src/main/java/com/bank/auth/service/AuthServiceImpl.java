@@ -159,6 +159,26 @@ public class AuthServiceImpl implements AuthService {
             AccountResponseDTO accountRes = bankAccountClient.createAccount(accountReq);
             bankAccountNo = accountRes.getAccountNo();
             logger.info("Created bank account {} for customer {}", bankAccountNo, createdCustomer.getId());
+
+            // Update customer record with the generated bank account number
+            CustomerCreateDTO updateReq = new CustomerCreateDTO();
+            updateReq.setSnnId(request.getSsnId());
+            updateReq.setFirstName(request.getFirstName());
+            updateReq.setLastName(request.getLastName());
+            updateReq.setEmail(request.getEmail());
+            updateReq.setContact(request.getContact());
+            updateReq.setAddress(request.getAddress());
+            updateReq.setAadharNo(request.getAadharNo());
+            updateReq.setPanNo(request.getPanNo());
+            updateReq.setDateOfBirth(request.getDateOfBirth());
+            updateReq.setGender(request.getGender());
+            updateReq.setMaritalStatus(request.getMaritalStatus());
+            updateReq.setBankAccountNo(bankAccountNo);
+            if (request.getDateOfBirth() != null) {
+                updateReq.setAge(java.time.Period.between(request.getDateOfBirth(), java.time.LocalDate.now()).getYears());
+            }
+            customerClient.updateCustomer(createdCustomer.getId(), updateReq);
+            logger.info("Updated customer {} with bank account {}", createdCustomer.getId(), bankAccountNo);
         } catch (Exception ex) {
             logger.error("Failed to create bank account for customer {}: {}", createdCustomer.getId(), ex.getMessage());
             response.setSuccess(false);

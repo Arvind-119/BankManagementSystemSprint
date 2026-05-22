@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import org.springframework.web.bind.annotation.PutMapping;
+
 @FeignClient(name = "customer-service", url = "http://localhost:8081")
 public interface CustomerClient {
 
@@ -19,4 +21,7 @@ public interface CustomerClient {
 
     @GetMapping("/api/v1/customers/ssn/{snnId}")
     CustomerDTO getCustomerBySsn(@PathVariable("snnId") String snnId);
+
+    @PutMapping("/api/v1/customers/{id}")
+    CustomerDTO updateCustomer(@PathVariable("id") Long id, @RequestBody CustomerCreateDTO request);
 }

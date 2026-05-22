@@ -65,7 +65,39 @@ import { RegisterResponse } from '../../../models/auth.model';
               <input type="text" formControlName="address" placeholder="Enter your address" maxlength="100" class="fi" id="reg-address">
               <span class="fe" *ngIf="f('address')">Address is required (max 100 chars)</span>
             </div>
-
+            <div class="fg">
+              <label>Aadhar Number</label>
+              <input type="text" formControlName="aadharNo" placeholder="12-digit Aadhar number" maxlength="12" class="fi" id="reg-aadhar">
+              <span class="fe" *ngIf="f('aadharNo')">Aadhar must be exactly 12 digits</span>
+            </div>
+            <div class="fg">
+              <label>PAN Number</label>
+              <input type="text" formControlName="panNo" placeholder="e.g. ABCDE1234F" maxlength="10" class="fi" id="reg-pan">
+              <span class="fe" *ngIf="f('panNo')">PAN must be 10 characters (e.g. ABCDE1234F)</span>
+            </div>
+            <div class="fg">
+              <label>Date of Birth</label>
+              <input type="date" formControlName="dateOfBirth" class="fi" id="reg-dob">
+            </div>
+            <div class="fg">
+              <label>Gender</label>
+              <select formControlName="gender" class="fi" id="reg-gender">
+                <option value="">Select Gender</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            <div class="fg full">
+              <label>Marital Status</label>
+              <select formControlName="maritalStatus" class="fi" id="reg-marital">
+                <option value="">Select Status</option>
+                <option value="Single">Single</option>
+                <option value="Married">Married</option>
+                <option value="Divorced">Divorced</option>
+                <option value="Widowed">Widowed</option>
+              </select>
+            </div>
           </div>
 
           <div class="form-actions">
@@ -120,6 +152,8 @@ import { RegisterResponse } from '../../../models/auth.model';
     .fi { padding: 12px 14px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: #fff; font-family: 'Inter', sans-serif; font-size: 13px; outline: none; transition: all 0.3s; }
     .fi:focus { border-color: rgba(102,126,234,0.5); box-shadow: 0 0 0 3px rgba(102,126,234,0.1); }
     .fi::placeholder { color: rgba(255,255,255,0.2); }
+    select.fi { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23ffffff50' d='M6 8L1 3h10z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 36px; }
+    select.fi option { background: #1a1a2e; color: #fff; }
     .fe { font-size: 11px; color: #ff416c; }
 
     .form-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 28px; padding-top: 24px; border-top: 1px solid rgba(255,255,255,0.08); }
@@ -167,7 +201,12 @@ export class RegisterComponent {
       password: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(30),
         Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,30}$/)]],
       confirmPassword: ['', Validators.required],
-      address: ['', [Validators.required, Validators.maxLength(100)]]
+      address: ['', [Validators.required, Validators.maxLength(100)]],
+      aadharNo: ['', [Validators.pattern(/^\d{12}$/)]],
+      panNo: ['', [Validators.pattern(/^[A-Z]{5}\d{4}[A-Z]$/)]],
+      dateOfBirth: [''],
+      gender: [''],
+      maritalStatus: ['']
     });
   }
 
@@ -206,7 +245,12 @@ export class RegisterComponent {
       email: val.email,
       contact: val.contact,
       password: val.password,
-      address: val.address
+      address: val.address,
+      aadharNo: val.aadharNo || undefined,
+      panNo: val.panNo || undefined,
+      dateOfBirth: val.dateOfBirth || undefined,
+      gender: val.gender || undefined,
+      maritalStatus: val.maritalStatus || undefined
     }).subscribe({
       next: (res) => {
         this.isLoading = false;
