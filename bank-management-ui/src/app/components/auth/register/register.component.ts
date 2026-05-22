@@ -65,6 +65,11 @@ import { RegisterResponse } from '../../../models/auth.model';
               <input type="text" formControlName="address" placeholder="Enter your address" maxlength="100" class="fi" id="reg-address">
               <span class="fe" *ngIf="f('address')">Address is required (max 100 chars)</span>
             </div>
+            <div class="fg full">
+              <label>Initial Deposit (Optional)</label>
+              <input type="number" formControlName="initialDeposit" placeholder="Amount to deposit initially (e.g. 5000)" class="fi" id="reg-deposit" min="0">
+              <span class="fe" *ngIf="f('initialDeposit')">Deposit cannot be negative</span>
+            </div>
           </div>
 
           <div class="form-actions">
@@ -166,7 +171,8 @@ export class RegisterComponent {
       password: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(30),
         Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,30}$/)]],
       confirmPassword: ['', Validators.required],
-      address: ['', [Validators.required, Validators.maxLength(100)]]
+      address: ['', [Validators.required, Validators.maxLength(100)]],
+      initialDeposit: [0, [Validators.min(0)]]
     });
   }
 
@@ -205,7 +211,8 @@ export class RegisterComponent {
       email: val.email,
       contact: val.contact,
       password: val.password,
-      address: val.address
+      address: val.address,
+      initialDeposit: val.initialDeposit
     }).subscribe({
       next: (res) => {
         this.isLoading = false;

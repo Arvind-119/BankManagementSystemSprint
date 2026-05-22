@@ -12,6 +12,7 @@ import com.bank.auth.feign.BankAccountClient;
 import com.bank.auth.dto.AccountRequestDTO;
 import com.bank.auth.dto.AccountResponseDTO;
 import com.bank.auth.repository.UserCredentialRepository;
+import com.bank.auth.security.JwtUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -28,13 +29,16 @@ public class AuthServiceImpl implements AuthService {
     private final UserCredentialRepository credentialRepository;
     private final CustomerClient customerClient;
     private final BankAccountClient bankAccountClient;
+    private final JwtUtil jwtUtil;
 
     public AuthServiceImpl(UserCredentialRepository credentialRepository,
                            CustomerClient customerClient,
-                           BankAccountClient bankAccountClient) {
+                           BankAccountClient bankAccountClient,
+                           JwtUtil jwtUtil) {
         this.credentialRepository = credentialRepository;
         this.customerClient = customerClient;
         this.bankAccountClient = bankAccountClient;
+        this.jwtUtil = jwtUtil;
     }
 
     @Override
@@ -73,6 +77,10 @@ public class AuthServiceImpl implements AuthService {
         response.setRole(credential.getRole());
         response.setLinkedCustomerId(credential.getLinkedCustomerId());
         response.setMessage("Login successful.");
+        
+        // Generate JWT Token
+        String token = jwtUtil.generateToken(credential.getLoginId(), credential.getRole());
+        response.setToken(token);
 
         logger.info("Login successful for user: {} role: {}", request.getLoginId(), request.getRole());
         return response;
@@ -146,7 +154,7 @@ public class AuthServiceImpl implements AuthService {
             accountReq.setAccountType("SAVINGS");
             accountReq.setBranchName("Main Branch");
             accountReq.setIfscCode("BANK0000001");
-            accountReq.setInitialDeposit(java.math.BigDecimal.ZERO);
+            accountReq.setInitialDeposit(request.getInitialDeposit() != null ? request.getInitialDeposit() : java.math.BigDecimal.ZERO);
             
             AccountResponseDTO accountRes = bankAccountClient.createAccount(accountReq);
             bankAccountNo = accountRes.getAccountNo();

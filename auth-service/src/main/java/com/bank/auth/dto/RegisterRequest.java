@@ -38,6 +38,7 @@ public class RegisterRequest {
     private LocalDate dateOfBirth;
     private String gender;
     private String maritalStatus;
+    private java.math.BigDecimal initialDeposit;
 
     public RegisterRequest() {}
 
@@ -77,4 +78,7 @@ public class RegisterRequest {
 
     public String getMaritalStatus() { return maritalStatus; }
     public void setMaritalStatus(String maritalStatus) { this.maritalStatus = maritalStatus; }
+
+    public java.math.BigDecimal getInitialDeposit() { return initialDeposit; }
+    public void setInitialDeposit(java.math.BigDecimal initialDeposit) { this.initialDeposit = initialDeposit; }
 }

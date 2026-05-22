@@ -12,6 +12,7 @@ export interface LoginResponse {
   linkedCustomerId: number;
   message: string;
   success: boolean;
+  token: string;
 }
 
 export interface RegisterRequest {
@@ -27,6 +28,7 @@ export interface RegisterRequest {
   dateOfBirth?: string;
   gender?: string;
   maritalStatus?: string;
+  initialDeposit?: number;
 }
 
 export interface RegisterResponse {
@@ -45,4 +47,5 @@ export interface SessionUser {
   name: string;
   role: string;
   linkedCustomerId: number;
+  token: string;
 }

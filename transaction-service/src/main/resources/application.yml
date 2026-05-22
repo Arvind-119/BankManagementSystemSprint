@@ -25,3 +25,7 @@ eureka:
       defaultZone: http://localhost:8761/eureka/
   instance:
     prefer-ip-address: true
+
+jwt:
+  secret: aVeryLongSecretKeyThatIsAtLeast32BytesForHmacSha256AlgorithmsToWorkProperlyInJjwt
+  expirationMs: 86400000

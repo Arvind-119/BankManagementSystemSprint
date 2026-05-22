@@ -32,3 +32,7 @@ eureka:
     register-with-eureka: true
   instance:
     prefer-ip-address: true
+
+jwt:
+  secret: aVeryLongSecretKeyThatIsAtLeast32BytesForHmacSha256AlgorithmsToWorkProperlyInJjwt
+  expirationMs: 86400000

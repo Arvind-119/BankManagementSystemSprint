@@ -33,7 +33,8 @@ export class AuthService {
       loginId: response.loginId,
       name: response.name,
       role: response.role,
-      linkedCustomerId: response.linkedCustomerId
+      linkedCustomerId: response.linkedCustomerId,
+      token: response.token
     };
     sessionStorage.setItem(this.sessionKey, JSON.stringify(user));
     this.currentUserSubject.next(user);
