@@ -3,7 +3,9 @@ import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CustomerService } from '../../../services/customer.service';
+import { AccountService } from '../../../services/account.service';
 import { Customer } from '../../../models/customer.model';
+import { BankAccount } from '../../../models/account.model';
 
 @Component({
   selector: 'app-customer-list',
@@ -143,7 +145,7 @@ export class CustomerListComponent implements OnInit {
   toastMessage = '';
   toastType = 'success';
 
-  constructor(private customerService: CustomerService) {}
+  constructor(private customerService: CustomerService, private accountService: AccountService) {}
 
   ngOnInit(): void {
     this.loadCustomers();
@@ -156,6 +158,24 @@ export class CustomerListComponent implements OnInit {
         this.customers = data;
         this.filteredCustomers = data;
         this.loading = false;
+        // Fetch accounts to fill in missing bankAccountNo
+        this.accountService.getAll().subscribe({
+          next: (accounts: BankAccount[]) => {
+            const accountMap = new Map<number, string>();
+            accounts.forEach(acc => {
+              if (acc.customerId && acc.accountNo) {
+                accountMap.set(acc.customerId, acc.accountNo);
+              }
+            });
+            this.customers.forEach(c => {
+              if (!c.bankAccountNo && accountMap.has(c.id)) {
+                c.bankAccountNo = accountMap.get(c.id)!;
+              }
+            });
+            this.filterCustomers();
+          },
+          error: () => {} // Silently ignore — account numbers just won't be enriched
+        });
       },
       error: (err) => {
         console.error('Error loading customers:', err);

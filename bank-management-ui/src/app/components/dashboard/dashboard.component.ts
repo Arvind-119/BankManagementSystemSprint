@@ -281,6 +281,23 @@ export class DashboardComponent implements OnInit {
       next: (data) => {
         this.customerCount = data.length;
         this.recentCustomers = data.slice(-5).reverse();
+        // Enrich customers with account numbers from bank-service
+        this.accountService.getAll().subscribe({
+          next: (accounts) => {
+            const accountMap = new Map<number, string>();
+            accounts.forEach(acc => {
+              if (acc.customerId && acc.accountNo) {
+                accountMap.set(acc.customerId, acc.accountNo);
+              }
+            });
+            this.recentCustomers.forEach(c => {
+              if (!c.bankAccountNo && accountMap.has(c.id)) {
+                (c as any).bankAccountNo = accountMap.get(c.id)!;
+              }
+            });
+          },
+          error: () => {}
+        });
       },
       error: () => this.customerCount = 0
     });
