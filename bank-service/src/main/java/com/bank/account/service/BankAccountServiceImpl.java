@@ -204,7 +204,7 @@ public class BankAccountServiceImpl implements BankAccountService {
         logger.info("Transfer of {} from {} to {} successful", request.getAmount(),
                 request.getFromAccountNo(), request.getToAccountNo());
 
-        // Log transaction via Feign
+        // Log transaction via Feign for source account
         try {
             TransactionDTO transaction = new TransactionDTO();
             transaction.setAccountNo(request.getFromAccountNo());
@@ -217,6 +217,20 @@ public class BankAccountServiceImpl implements BankAccountService {
             transaction.setTransactionDate(LocalDateTime.now());
             transaction.setStatus("SUCCESS");
             transactionClient.createTransaction(transaction);
+            
+            // Also log for destination account
+            TransactionDTO transactionTo = new TransactionDTO();
+            transactionTo.setAccountNo(request.getToAccountNo());
+            transactionTo.setTransactionType("DEPOSIT"); // Or a special type indicating received transfer
+            transactionTo.setAmount(request.getAmount());
+            transactionTo.setFromAccount(request.getFromAccountNo());
+            transactionTo.setToAccount(request.getToAccountNo());
+            transactionTo.setDescription("Transfer from " + request.getFromAccountNo() + (request.getDescription() != null && !request.getDescription().isEmpty() ? " - " + request.getDescription() : ""));
+            transactionTo.setBalanceAfterTransaction(toAccount.getBalance());
+            transactionTo.setTransactionDate(LocalDateTime.now());
+            transactionTo.setStatus("SUCCESS");
+            transactionClient.createTransaction(transactionTo);
+            
         } catch (Exception ex) {
             logger.warn("Failed to log transfer transaction from {} to {}: {}",
                     request.getFromAccountNo(), request.getToAccountNo(), ex.getMessage());

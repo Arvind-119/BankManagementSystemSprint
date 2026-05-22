@@ -230,7 +230,7 @@ export class CustomerDashboardComponent implements OnInit {
     private authService: AuthService,
     private accountService: AccountService,
     private router: Router
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.user = this.authService.getSession();
@@ -249,7 +249,7 @@ export class CustomerDashboardComponent implements OnInit {
             this.account = accounts[0];
           }
         },
-        error: () => {}
+        error: () => { }
       });
     }
   }
@@ -313,7 +313,7 @@ export class CustomerDashboardComponent implements OnInit {
     if (this.account) {
       this.accountService.getByAccountNo(this.account.accountNo).subscribe({
         next: (res) => { this.account = res; },
-        error: () => {}
+        error: () => { }
       });
     }
   }
