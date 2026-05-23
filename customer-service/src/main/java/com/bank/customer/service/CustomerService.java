@@ -18,4 +18,6 @@ public interface CustomerService {
     CustomerResponseDTO updateCustomer(Long id, CustomerRequestDTO request);
 
     void deleteCustomer(Long id);
+
+    List<CustomerResponseDTO> searchCustomers(String keyword);
 }

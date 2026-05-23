@@ -2,6 +2,8 @@ package com.bank.customer.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 
 import java.time.LocalDate;
 
@@ -28,12 +30,16 @@ public class CustomerRequestDTO {
 
     private String bankAccountNo;
 
+    @Pattern(regexp = "^\\d{12}$", message = "Aadhar must be exactly 12 digits")
     private String aadharNo;
 
+    @Pattern(regexp = "^[A-Z]{5}[0-9]{4}[A-Z]{1}$", message = "PAN must follow 5 letters, 4 digits, 1 letter format")
     private String panNo;
 
+    @Pattern(regexp = "^[6-9]\\d{9}$", message = "Contact must be a 10-digit number starting with 6, 7, 8, or 9")
     private String contact;
 
+    @Size(max = 100, message = "Address cannot exceed 100 characters")
     private String address;
 
     private String gender;

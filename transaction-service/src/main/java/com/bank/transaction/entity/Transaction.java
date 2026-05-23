@@ -60,7 +60,7 @@ public class Transaction {
             this.transactionDate = LocalDateTime.now();
         }
         if (this.transactionId == null) {
-            this.transactionId = UUID.randomUUID().toString();
+            this.transactionId = UUID.randomUUID().toString().substring(0, 8);
         }
     }
 

@@ -13,9 +13,12 @@ public class DataSeeder implements CommandLineRunner {
     private static final Logger logger = LoggerFactory.getLogger(DataSeeder.class);
 
     private final UserCredentialRepository credentialRepository;
+    private final org.springframework.security.crypto.password.PasswordEncoder passwordEncoder;
 
-    public DataSeeder(UserCredentialRepository credentialRepository) {
+    public DataSeeder(UserCredentialRepository credentialRepository,
+                      org.springframework.security.crypto.password.PasswordEncoder passwordEncoder) {
         this.credentialRepository = credentialRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -24,7 +27,7 @@ public class DataSeeder implements CommandLineRunner {
         if (!credentialRepository.existsByLoginIdAndRole("manager1", "manager")) {
             UserCredential manager = new UserCredential();
             manager.setLoginId("manager1");
-            manager.setPassword("manager123");
+            manager.setPassword(passwordEncoder.encode("manager123"));
             manager.setRole("manager");
             manager.setName("Arvind Sahni");
             manager.setLinkedCustomerId(null);

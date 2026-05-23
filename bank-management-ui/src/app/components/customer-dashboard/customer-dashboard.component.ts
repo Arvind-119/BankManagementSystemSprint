@@ -147,7 +147,7 @@ import { Transaction } from '../../models/transaction.model';
                 </thead>
                 <tbody>
                   <tr *ngFor="let txn of transactions" style="border-bottom: 1px solid rgba(255,255,255,0.05);">
-                    <td style="padding: 12px; font-family: monospace;">{{ txn.transactionId | slice:0:8 }}</td>
+                    <td style="padding: 12px; font-family: monospace;">{{ txn.transactionId }}</td>
                     <td style="padding: 12px;">
                       <div *ngIf="txn.transactionType === 'TRANSFER'">
                         <span class="type-badge type-transfer">Transfer</span>

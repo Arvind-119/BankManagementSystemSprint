@@ -82,7 +82,7 @@ import { Customer } from '../../models/customer.model';
               </thead>
               <tbody>
                 <tr *ngFor="let t of recentTransactions">
-                  <td class="txn-id">{{ t.transactionId | slice:0:12 }}...</td>
+                  <td class="txn-id">{{ t.transactionId }}</td>
                   <td>{{ t.fromAccount || t.accountNo }}</td>
                   <td>{{ t.toAccount || '—' }}</td>
                   <td>

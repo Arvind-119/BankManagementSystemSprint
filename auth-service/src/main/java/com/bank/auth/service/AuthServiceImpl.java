@@ -30,15 +30,18 @@ public class AuthServiceImpl implements AuthService {
     private final CustomerClient customerClient;
     private final BankAccountClient bankAccountClient;
     private final JwtUtil jwtUtil;
+    private final org.springframework.security.crypto.password.PasswordEncoder passwordEncoder;
 
     public AuthServiceImpl(UserCredentialRepository credentialRepository,
                            CustomerClient customerClient,
                            BankAccountClient bankAccountClient,
-                           JwtUtil jwtUtil) {
+                           JwtUtil jwtUtil,
+                           org.springframework.security.crypto.password.PasswordEncoder passwordEncoder) {
         this.credentialRepository = credentialRepository;
         this.customerClient = customerClient;
         this.bankAccountClient = bankAccountClient;
         this.jwtUtil = jwtUtil;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -60,7 +63,7 @@ public class AuthServiceImpl implements AuthService {
 
         UserCredential credential = credentialOpt.get();
 
-        if (!credential.getPassword().equals(request.getPassword())) {
+        if (!passwordEncoder.matches(request.getPassword(), credential.getPassword())) {
             response.setSuccess(false);
             if ("manager".equals(request.getRole())) {
                 response.setMessage("Invalid manager credentials.");
@@ -203,7 +206,7 @@ public class AuthServiceImpl implements AuthService {
         // Create credentials in auth-service
         UserCredential credential = new UserCredential();
         credential.setLoginId(request.getSsnId());
-        credential.setPassword(password);
+        credential.setPassword(passwordEncoder.encode(password));
         credential.setRole("customer");
         credential.setLinkedCustomerId(createdCustomer.getId());
         credential.setName(request.getFirstName() + " " + request.getLastName());

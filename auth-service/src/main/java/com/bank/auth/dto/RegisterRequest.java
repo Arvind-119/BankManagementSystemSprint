@@ -2,6 +2,7 @@ package com.bank.auth.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 import java.time.LocalDate;
@@ -22,15 +23,20 @@ public class RegisterRequest {
     @Email(message = "Email should be valid")
     private String email;
 
+    @Pattern(regexp = "^[6-9]\\d{9}$", message = "Contact must be a 10-digit number starting with 6, 7, 8, or 9")
     private String contact;
 
     @NotBlank(message = "Password is required")
+    @Pattern(regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=!]).{8,}$", message = "Password must have a minimum of 8 characters, including 1 uppercase, 1 lowercase, 1 number, and 1 symbol")
     private String password;
 
+    @Size(max = 100, message = "Address cannot exceed 100 characters")
     private String address;
 
     // Optional fields
+    @Pattern(regexp = "^\\d{12}$", message = "Aadhar must be exactly 12 digits")
     private String aadharNo;
+    @Pattern(regexp = "^[A-Z]{5}[0-9]{4}[A-Z]{1}$", message = "PAN must follow 5 letters, 4 digits, 1 letter format")
     private String panNo;
     private LocalDate dateOfBirth;
     private String gender;

@@ -39,7 +39,7 @@ import { Transaction } from '../../../models/transaction.model';
             </thead>
             <tbody>
               <tr *ngFor="let txn of filteredTransactions" class="table-row">
-                <td class="mono">{{ txn.transactionId | slice:0:8 }}...</td>
+                <td class="mono">{{ txn.transactionId }}</td>
                 <td class="mono">{{ txn.fromAccount || txn.accountNo }}</td>
                 <td class="mono">{{ txn.toAccount || '—' }}</td>
                 <td>

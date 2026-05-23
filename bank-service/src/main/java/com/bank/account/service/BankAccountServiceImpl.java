@@ -153,10 +153,10 @@ public class BankAccountServiceImpl implements BankAccountService {
             throw new InsufficientBalanceException("Insufficient balance. Current balance: ₹" + account.getBalance());
         }
 
-        // Business rule borrowed from previous version: Balance must remain at least ₹500 after withdrawal
+        // Business rule borrowed from previous version: Balance must remain at least ₹500 after withdrawal for SAVINGS accounts
         BigDecimal balanceAfter = account.getBalance().subtract(request.getAmount());
-        if (balanceAfter.compareTo(new BigDecimal("500")) < 0) {
-            throw new InsufficientBalanceException("Cannot withdraw. Minimum balance of ₹500 must be maintained. Available for withdrawal: ₹" + account.getBalance().subtract(new BigDecimal("500")));
+        if (com.bank.account.entity.AccountType.SAVINGS.equals(account.getAccountType()) && balanceAfter.compareTo(new BigDecimal("500")) < 0) {
+            throw new InsufficientBalanceException("Cannot withdraw. Savings accounts must maintain a minimum balance of ₹500. Available for withdrawal: ₹" + account.getBalance().subtract(new BigDecimal("500")));
         }
 
         account.setBalance(balanceAfter);

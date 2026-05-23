@@ -101,6 +101,15 @@ public class CustomerServiceImpl implements CustomerService {
         customerRepository.delete(customer);
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public List<CustomerResponseDTO> searchCustomers(String keyword) {
+        List<Customer> customers = customerRepository.searchCustomers(keyword);
+        return customers.stream()
+                .map(this::mapToResponseDTO)
+                .collect(Collectors.toList());
+    }
+
     // ---- Mapping Helpers ----
 
     private Customer mapToEntity(CustomerRequestDTO dto) {

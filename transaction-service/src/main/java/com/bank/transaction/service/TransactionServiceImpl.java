@@ -27,7 +27,7 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     public TransactionResponseDTO createTransaction(TransactionRequestDTO request) {
         Transaction transaction = new Transaction();
-        transaction.setTransactionId(UUID.randomUUID().toString());
+        transaction.setTransactionId(UUID.randomUUID().toString().substring(0, 8));
         transaction.setAccountNo(request.getAccountNo());
         transaction.setTransactionType(request.getTransactionType());
         transaction.setAmount(request.getAmount());

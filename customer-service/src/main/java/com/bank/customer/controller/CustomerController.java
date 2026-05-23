@@ -58,6 +58,13 @@ public class CustomerController {
         return new ResponseEntity<>(customer, HttpStatus.OK);
     }
 
+    @GetMapping("/search")
+    @Operation(summary = "Search customers", description = "Search customers by name, SSN, email, or account number")
+    public ResponseEntity<List<CustomerResponseDTO>> searchCustomers(@org.springframework.web.bind.annotation.RequestParam("keyword") String keyword) {
+        List<CustomerResponseDTO> customers = customerService.searchCustomers(keyword);
+        return new ResponseEntity<>(customers, HttpStatus.OK);
+    }
+
     @PutMapping("/{id}")
     @Operation(summary = "Update a customer", description = "Updates an existing customer record")
     public ResponseEntity<CustomerResponseDTO> updateCustomer(@PathVariable Long id,

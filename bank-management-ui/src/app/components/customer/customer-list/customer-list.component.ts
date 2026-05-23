@@ -165,24 +165,7 @@ export class CustomerListComponent implements OnInit {
         this.customers = data;
         this.filteredCustomers = data;
         this.loading = false;
-        // Fetch accounts to fill in missing bankAccountNo
-        this.accountService.getAll().subscribe({
-          next: (accounts: BankAccount[]) => {
-            const accountMap = new Map<number, string>();
-            accounts.forEach(acc => {
-              if (acc.customerId && acc.accountNo) {
-                accountMap.set(acc.customerId, acc.accountNo);
-              }
-            });
-            this.customers.forEach(c => {
-              if (!c.bankAccountNo && accountMap.has(c.id)) {
-                c.bankAccountNo = accountMap.get(c.id)!;
-              }
-            });
-            this.filterCustomers();
-          },
-          error: () => {} // Silently ignore — account numbers just won't be enriched
-        });
+        this.enrichCustomers(this.customers);
       },
       error: (err) => {
         console.error('Error loading customers:', err);
@@ -192,18 +175,41 @@ export class CustomerListComponent implements OnInit {
     });
   }
 
+  enrichCustomers(customersToEnrich: Customer[]): void {
+    this.accountService.getAll().subscribe({
+      next: (accounts: BankAccount[]) => {
+        const accountMap = new Map<number, string>();
+        accounts.forEach(acc => {
+          if (acc.customerId && acc.accountNo) {
+            accountMap.set(acc.customerId, acc.accountNo);
+          }
+        });
+        customersToEnrich.forEach(c => {
+          if (!c.bankAccountNo && accountMap.has(c.id)) {
+            c.bankAccountNo = accountMap.get(c.id)!;
+          }
+        });
+      },
+      error: () => {} // Silently ignore — account numbers just won't be enriched
+    });
+  }
+
   filterCustomers(): void {
-    const term = this.searchTerm.toLowerCase();
-    this.filteredCustomers = this.customers.filter(c =>
-      c.firstName?.toLowerCase().includes(term) ||
-      c.lastName?.toLowerCase().includes(term) ||
-      c.email?.toLowerCase().includes(term) ||
-      c.snnId?.toLowerCase().includes(term) ||
-      c.panNo?.toLowerCase().includes(term) ||
-      c.bankAccountNo?.toLowerCase().includes(term) ||
-      c.contact?.toLowerCase().includes(term) ||
-      c.address?.toLowerCase().includes(term)
-    );
+    const term = this.searchTerm.trim();
+    if (!term) {
+      this.filteredCustomers = [...this.customers];
+      return;
+    }
+
+    this.customerService.search(term).subscribe({
+      next: (data) => {
+        this.filteredCustomers = data;
+        this.enrichCustomers(this.filteredCustomers);
+      },
+      error: (err) => {
+        console.error('Error searching customers:', err);
+      }
+    });
   }
 
   deleteCustomer(id: number): void {
