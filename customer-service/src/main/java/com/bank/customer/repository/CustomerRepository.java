@@ -28,8 +28,9 @@ public interface CustomerRepository extends JpaRepository<Customer, Long> {
     @org.springframework.data.jpa.repository.Query("SELECT c FROM Customer c WHERE " +
             "LOWER(c.firstName) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
             "LOWER(c.lastName) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+            "LOWER(CONCAT(c.firstName, ' ', c.lastName)) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
             "LOWER(c.email) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
-            "c.snnId LIKE CONCAT('%', :keyword, '%') OR " +
-            "c.bankAccountNo LIKE CONCAT('%', :keyword, '%')")
+            "LOWER(c.snnId) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+            "LOWER(c.bankAccountNo) LIKE LOWER(CONCAT('%', :keyword, '%'))")
     java.util.List<Customer> searchCustomers(@org.springframework.data.repository.query.Param("keyword") String keyword);
 }

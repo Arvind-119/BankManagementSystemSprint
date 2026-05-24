@@ -23,10 +23,6 @@ export class AuthService {
     return this.http.post<RegisterResponse>(`${this.apiUrl}/register`, request);
   }
 
-  registerByManager(request: RegisterRequest): Observable<RegisterResponse> {
-    return this.http.post<RegisterResponse>(`${this.apiUrl}/register/by-manager`, request);
-  }
-
   updatePassword(request: { loginId: string, newPassword: string }): Observable<any> {
     return this.http.put(`${this.apiUrl}/password`, request, { responseType: 'text' });
   }

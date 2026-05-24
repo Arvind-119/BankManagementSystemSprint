@@ -49,16 +49,7 @@ public class AuthController {
         }
     }
 
-    @PostMapping("/register/by-manager")
-    @Operation(summary = "Register Customer by Manager", description = "Manager creates a new customer (SSN used as default password)")
-    public ResponseEntity<RegisterResponse> registerByManager(@Valid @RequestBody RegisterRequest request) {
-        RegisterResponse response = authService.registerCustomerByManager(request);
-        if (response.isSuccess()) {
-            return new ResponseEntity<>(response, HttpStatus.CREATED);
-        } else {
-            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-        }
-    }
+
 
     @org.springframework.web.bind.annotation.PutMapping("/password")
     @Operation(summary = "Update Password", description = "Update user password")

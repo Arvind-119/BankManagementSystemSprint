@@ -109,11 +109,7 @@ import { Customer } from '../../models/customer.model';
         <div class="quick-actions glass-card">
           <h3>Quick Actions</h3>
           <div class="actions-grid">
-            <a routerLink="/customers/new" class="action-btn" id="action-add-customer">
-              <span class="action-icon">👤</span>
-              <span>Add Customer</span>
-            </a>
-            <a routerLink="/transactions" class="action-btn" id="action-view-txn">
+            <a routerLink="/transactions" class="action-btn" id="action-view-txn" style="grid-column: span 2;">
               <span class="action-icon">💳</span>
               <span>View Txns</span>
             </a>

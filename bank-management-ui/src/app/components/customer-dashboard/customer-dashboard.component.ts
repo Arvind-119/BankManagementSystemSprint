@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -183,8 +183,29 @@ import { Customer } from '../../models/customer.model';
             </div>
           </div>
 
-          <!-- PROFILE SECTION -->
+          <!-- PROFILE VIEW SECTION -->
           <div *ngIf="activeSection === 'profile'" class="section" id="section-profile">
+            <div style="max-width: 700px; text-align: center;">
+              <h2>My Profile</h2>
+              <p class="section-sub">Your personal details</p>
+            </div>
+            <div class="op-card" style="max-width: 700px;">
+              <div class="details-grid" *ngIf="customerProfile">
+                <div class="detail-item"><span class="dl">Name</span><span class="dv">{{ customerProfile.firstName }} {{ customerProfile.lastName }}</span></div>
+                <div class="detail-item"><span class="dl">Email</span><span class="dv">{{ customerProfile.email }}</span></div>
+                <div class="detail-item"><span class="dl">Contact Number</span><span class="dv">{{ customerProfile.contact }}</span></div>
+                <div class="detail-item"><span class="dl">Address</span><span class="dv">{{ customerProfile.address }}</span></div>
+                <div class="detail-item"><span class="dl">SSN ID</span><span class="dv">{{ customerProfile.snnId }}</span></div>
+              </div>
+              <div style="margin-top: 24px; display: flex; gap: 16px;">
+                <button class="btn-action btn-primary" (click)="showSection('edit-profile')">Edit Profile</button>
+                <button class="btn-action btn-outline" (click)="showSection('change-password')">Change Password</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- EDIT PROFILE SECTION -->
+          <div *ngIf="activeSection === 'edit-profile'" class="section" id="section-edit-profile">
             <h2>Edit Profile</h2>
             <p class="section-sub">Update your personal details</p>
             <div class="op-card" style="max-width: 700px;">
@@ -219,18 +240,6 @@ import { Customer } from '../../models/customer.model';
                     <input type="text" formControlName="address" class="fi" maxlength="100">
                     <span class="fe" *ngIf="f('address')" style="color:#ff416c; font-size:11px;">Address is required (max 100 chars)</span>
                   </div>
-                  
-                  <div class="fg">
-                    <label>New Password (Optional)</label>
-                    <input type="password" formControlName="newPassword" placeholder="Min 8 chars, upper, lower, digit, symbol" class="fi">
-                    <span class="fe" *ngIf="f('newPassword')" style="color:#ff416c; font-size:11px;">8-30 chars: uppercase, lowercase, digit, and symbol</span>
-                  </div>
-                  <div class="fg">
-                    <label>Confirm New Password</label>
-                    <input type="password" formControlName="confirmNewPassword" placeholder="Re-enter new password" class="fi">
-                    <span class="fe" *ngIf="f('confirmNewPassword') || passwordMismatch()" style="color:#ff416c; font-size:11px;">Passwords must match</span>
-                  </div>
-
                   <div class="fg">
                     <label>Aadhar Number</label>
                     <input type="text" formControlName="aadharNo" placeholder="12-digit Aadhar number" maxlength="12" class="fi">
@@ -266,10 +275,36 @@ import { Customer } from '../../models/customer.model';
                   </div>
                 </div>
 
-                <div style="margin-top: 24px;">
+                <div style="margin-top: 24px; display: flex; gap: 12px;">
                   <button type="submit" class="btn-action btn-primary" [disabled]="profileLoading">{{ profileLoading ? 'Updating...' : 'Update Profile' }}</button>
-                  <div class="txn-msg" *ngIf="profileMsg" [class.msg-success]="!profileError" [class.msg-error]="profileError">{{ profileMsg }}</div>
+                  <button type="button" class="btn-action btn-outline" (click)="showSection('profile')">Cancel</button>
                 </div>
+                <div class="txn-msg" *ngIf="profileMsg" [class.msg-success]="!profileError" [class.msg-error]="profileError" style="margin-top: 16px;">{{ profileMsg }}</div>
+              </form>
+            </div>
+          </div>
+
+          <!-- CHANGE PASSWORD SECTION -->
+          <div *ngIf="activeSection === 'change-password'" class="section" id="section-change-password">
+            <h2>Change Password</h2>
+            <p class="section-sub">Update your account password</p>
+            <div class="op-card" style="max-width: 480px;">
+              <form [formGroup]="passwordForm" (ngSubmit)="onPasswordSubmit()">
+                <div class="fg">
+                  <label>New Password *</label>
+                  <input type="password" formControlName="newPassword" placeholder="Min 8 chars, upper, lower, digit, symbol" class="fi">
+                  <span class="fe" *ngIf="fp('newPassword')" style="color:#ff416c; font-size:11px;">8-30 chars: uppercase, lowercase, digit, and symbol</span>
+                </div>
+                <div class="fg">
+                  <label>Confirm New Password *</label>
+                  <input type="password" formControlName="confirmNewPassword" placeholder="Re-enter new password" class="fi">
+                  <span class="fe" *ngIf="fp('confirmNewPassword') || passMismatch()" style="color:#ff416c; font-size:11px;">Passwords must match</span>
+                </div>
+                <div style="margin-top: 24px; display: flex; gap: 12px;">
+                  <button type="submit" class="btn-action btn-primary" [disabled]="passLoading">{{ passLoading ? 'Updating...' : 'Change Password' }}</button>
+                  <button type="button" class="btn-action btn-outline" (click)="showSection('profile')">Cancel</button>
+                </div>
+                <div class="txn-msg" *ngIf="passMsg" [class.msg-success]="!passError" [class.msg-error]="passError" style="margin-top: 16px;">{{ passMsg }}</div>
               </form>
             </div>
           </div>
@@ -395,10 +430,14 @@ export class CustomerDashboardComponent implements OnInit {
   opLoading = false;
 
   profileForm!: FormGroup;
+  passwordForm!: FormGroup;
   customerProfile: Customer | null = null;
   profileLoading = false;
   profileMsg = '';
   profileError = false;
+  passLoading = false;
+  passMsg = '';
+  passError = false;
 
   constructor(
     private authService: AuthService,
@@ -415,6 +454,7 @@ export class CustomerDashboardComponent implements OnInit {
       this.router.navigate(['/login']);
       return;
     }
+    window.history.replaceState({ section: 'home' }, '');
     this.initProfileForm();
     this.loadAccount();
   }
@@ -427,13 +467,16 @@ export class CustomerDashboardComponent implements OnInit {
       lastName: ['', [Validators.required, Validators.pattern(/^[A-Za-z\s]{1,50}$/)]],
       email: ['', [Validators.required, Validators.email]],
       address: ['', [Validators.required, Validators.maxLength(100)]],
-      newPassword: ['', [Validators.minLength(8), Validators.maxLength(30), Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,30}$/)]],
-      confirmNewPassword: [''],
       aadharNo: ['', [Validators.pattern(/^\d{12}$/)]],
       panNo: ['', [Validators.pattern(/^[A-Z]{5}\d{4}[A-Z]$/)]],
       dateOfBirth: [''],
       gender: [''],
       maritalStatus: ['']
+    });
+
+    this.passwordForm = this.fb.group({
+      newPassword: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(30), Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,30}$/)]],
+      confirmNewPassword: ['', Validators.required]
     });
   }
 
@@ -460,8 +503,17 @@ export class CustomerDashboardComponent implements OnInit {
     }
   }
 
-  showSection(s: string): void {
+  @HostListener('window:popstate', ['$event'])
+  onPopState(event: PopStateEvent): void {
+    const section = event.state?.section || 'home';
+    this.showSection(section, false);
+  }
+
+  showSection(s: string, pushToHistory: boolean = true): void {
     this.activeSection = s;
+    if (pushToHistory) {
+      window.history.pushState({ section: s }, '');
+    }
     this.txnMsg = '';
     this.depositAmount = null;
     this.withdrawAmount = null;
@@ -471,14 +523,20 @@ export class CustomerDashboardComponent implements OnInit {
     
     this.profileMsg = '';
     this.profileError = false;
+    this.passMsg = '';
+    this.passError = false;
     
     document.body.classList.remove('sidebar-open');
 
     // Always reload account and transactions freshly when switching tabs
     this.loadAccount();
     
-    if (s === 'profile') {
+    if (s === 'profile' || s === 'edit-profile') {
       this.loadProfile();
+    }
+    
+    if (s === 'change-password') {
+      this.passwordForm.reset();
     }
   }
 
@@ -500,8 +558,6 @@ export class CustomerDashboardComponent implements OnInit {
             gender: customer.gender,
             maritalStatus: customer.maritalStatus
           });
-          this.profileForm.get('newPassword')?.setValue('');
-          this.profileForm.get('confirmNewPassword')?.setValue('');
         },
         error: () => {
           this.showProfileMsg('Failed to load profile data', true);
@@ -591,15 +647,25 @@ export class CustomerDashboardComponent implements OnInit {
     return !!(c && c.invalid && (c.dirty || c.touched));
   }
 
-  passwordMismatch(): boolean {
-    const pw = this.profileForm.get('newPassword')?.value;
-    const cpw = this.profileForm.get('confirmNewPassword')?.value;
+  fp(field: string): boolean {
+    const c = this.passwordForm.get(field);
+    return !!(c && c.invalid && (c.dirty || c.touched));
+  }
+
+  passMismatch(): boolean {
+    const pw = this.passwordForm.get('newPassword')?.value;
+    const cpw = this.passwordForm.get('confirmNewPassword')?.value;
     return !!(pw && cpw && pw !== cpw);
   }
 
   private showProfileMsg(msg: string, err: boolean): void {
     this.profileMsg = msg;
     this.profileError = err;
+  }
+  
+  private showPassMsg(msg: string, err: boolean): void {
+    this.passMsg = msg;
+    this.passError = err;
   }
 
   onProfileSubmit(): void {
@@ -608,11 +674,6 @@ export class CustomerDashboardComponent implements OnInit {
     if (this.profileForm.invalid) {
       this.profileForm.markAllAsTouched();
       this.showProfileMsg('Please fix all validation errors.', true);
-      return;
-    }
-
-    if (this.passwordMismatch()) {
-      this.showProfileMsg('Passwords do not match.', true);
       return;
     }
 
@@ -638,35 +699,56 @@ export class CustomerDashboardComponent implements OnInit {
 
     this.customerService.update(this.customerProfile.id, updateReq).subscribe({
       next: () => {
-        // Handle password change if provided
-        const newPass = val.newPassword;
-        if (newPass && this.user) {
-          this.authService.updatePassword({ loginId: this.user.loginId, newPassword: newPass }).subscribe({
-            next: () => {
-              this.profileLoading = false;
-              this.showProfileMsg('Profile and password updated successfully!', false);
-              this.profileForm.get('newPassword')?.setValue('');
-              this.profileForm.get('confirmNewPassword')?.setValue('');
-            },
-            error: (err) => {
-              this.profileLoading = false;
-              this.showProfileMsg(err.error?.message || 'Profile updated, but failed to update password.', true);
-            }
-          });
-        } else {
-          this.profileLoading = false;
-          this.showProfileMsg('Profile updated successfully!', false);
-        }
+        this.profileLoading = false;
+        this.showProfileMsg('Profile updated successfully!', false);
         
         // Update user session name if changed
         if (this.user) {
           this.user.name = val.firstName + ' ' + val.lastName;
           sessionStorage.setItem('bankUser', JSON.stringify(this.user));
         }
+        
+        // Optionally navigate back to profile view after success
+        setTimeout(() => this.showSection('profile'), 1500);
       },
       error: (err) => {
         this.profileLoading = false;
         this.showProfileMsg(err.error?.message || 'Failed to update profile.', true);
+      }
+    });
+  }
+
+  onPasswordSubmit(): void {
+    this.passMsg = '';
+
+    if (this.passwordForm.invalid) {
+      this.passwordForm.markAllAsTouched();
+      this.showPassMsg('Please enter valid passwords.', true);
+      return;
+    }
+
+    if (this.passMismatch()) {
+      this.showPassMsg('Passwords do not match.', true);
+      return;
+    }
+
+    if (!this.user) return;
+
+    this.passLoading = true;
+    const newPass = this.passwordForm.get('newPassword')?.value;
+
+    this.authService.updatePassword({ loginId: this.user.loginId, newPassword: newPass }).subscribe({
+      next: () => {
+        this.passLoading = false;
+        this.showPassMsg('Password changed successfully!', false);
+        this.passwordForm.reset();
+        
+        // Optionally navigate back to profile view after success
+        setTimeout(() => this.showSection('profile'), 1500);
+      },
+      error: (err) => {
+        this.passLoading = false;
+        this.showPassMsg(err.error?.message || 'Failed to update password.', true);
       }
     });
   }

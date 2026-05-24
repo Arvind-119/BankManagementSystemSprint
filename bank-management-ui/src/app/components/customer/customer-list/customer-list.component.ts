@@ -18,9 +18,6 @@ import { BankAccount } from '../../../models/account.model';
           <h1>Customers</h1>
           <p>Manage all bank customers</p>
         </div>
-        <a routerLink="/customers/new" class="btn btn-primary" id="add-customer-btn">
-          <span>+</span> Add Customer
-        </a>
       </div>
 
       <div class="table-toolbar">

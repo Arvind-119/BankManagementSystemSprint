@@ -23,9 +23,7 @@ export class AccountService {
     return this.http.get<BankAccount>(`${this.apiUrl}/${accountNo}`);
   }
 
-  create(account: AccountRequest): Observable<BankAccount> {
-    return this.http.post<BankAccount>(this.apiUrl, account);
-  }
+
 
   update(id: number, account: AccountRequest): Observable<BankAccount> {
     return this.http.put<BankAccount>(`${this.apiUrl}/${id}`, account);

@@ -21,7 +21,6 @@ export const routes: Routes = [
   // Manager routes
   { path: 'dashboard', component: DashboardComponent, canActivate: [authGuard], data: { role: 'manager' } },
   { path: 'customers', component: CustomerListComponent, canActivate: [authGuard], data: { role: 'manager' } },
-  { path: 'customers/new', component: CustomerFormComponent, canActivate: [authGuard], data: { role: 'manager' } },
   { path: 'customers/edit/:id', component: CustomerFormComponent, canActivate: [authGuard], data: { role: 'manager' } },
   { path: 'accounts', component: AccountListComponent, canActivate: [authGuard], data: { role: 'manager' } },
 

@@ -94,11 +94,6 @@ public class AuthServiceImpl implements AuthService {
         return doRegisterCustomer(request, request.getPassword());
     }
 
-    @Override
-    public RegisterResponse registerCustomerByManager(RegisterRequest request) {
-        // Manager-created customers use SSN as default password
-        return doRegisterCustomer(request, request.getSsnId());
-    }
 
     private RegisterResponse doRegisterCustomer(RegisterRequest request, String password) {
         RegisterResponse response = new RegisterResponse();

@@ -13,8 +13,8 @@ import { AuthService } from '../../../services/auth.service';
     <div class="page-container">
       <div class="page-header">
         <div>
-          <h1>{{ isEdit ? 'Edit Customer' : 'Add New Customer' }}</h1>
-          <p>{{ isEdit ? 'Update customer information' : 'Fill in the details to create a new customer' }}</p>
+          <h1>Edit Customer</h1>
+          <p>Update customer information</p>
         </div>
         <a routerLink="/customers" class="btn btn-outline" id="back-to-customers">← Back to Customers</a>
       </div>
@@ -126,7 +126,7 @@ import { AuthService } from '../../../services/auth.service';
 
           <div class="form-actions">
             <button type="submit" class="btn btn-primary" [disabled]="customerForm.invalid || isSubmitting" id="submit-customer-btn" [class.shake-animation]="hasError">
-              {{ isSubmitting ? 'Saving...' : (isEdit ? '✓ Update Customer' : '+ Create Customer') }}
+              {{ isSubmitting ? 'Saving...' : '✓ Update Customer' }}
             </button>
             <a routerLink="/customers" class="btn btn-outline" id="cancel-customer-btn">Cancel</a>
           </div>
@@ -226,54 +226,20 @@ export class CustomerFormComponent implements OnInit {
 
     const formData = this.customerForm.value;
 
-    // For new customers created by manager, use auth service's register-by-manager endpoint
-    if (!this.isEdit) {
-      this.authService.registerByManager({
-        ssnId: formData.snnId,
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        email: formData.email,
-        contact: formData.contact || '',
-        password: formData.snnId, // SSN as default password
-        address: formData.address || '',
-        aadharNo: formData.aadharNo,
-        panNo: formData.panNo,
-        dateOfBirth: formData.dateOfBirth || null,
-        gender: formData.gender || '',
-        maritalStatus: formData.maritalStatus || ''
-      }).subscribe({
-        next: (res) => {
-          this.isSubmitting = false;
-          if (res.success) {
-            this.showToast('Customer created successfully', 'success');
-            setTimeout(() => this.router.navigate(['/customers']), 1500);
-          } else {
-            this.showToast(res.message || 'Failed to create customer', 'error');
-            this.triggerErrorAnimation();
-          }
-        },
-        error: (err) => {
-          this.isSubmitting = false;
-          this.showToast(err.error?.message || 'Failed to create customer', 'error');
-          this.triggerErrorAnimation();
-        }
-      });
-    } else {
-      const updateData = { ...formData, bankAccountNo: this.originalBankAccountNo };
-      this.customerService.update(this.customerId, updateData).subscribe({
-        next: () => {
-          this.isSubmitting = false;
-          this.showToast('Customer updated successfully', 'success');
-          setTimeout(() => this.router.navigate(['/customers']), 1500);
-        },
-        error: (err) => {
-          this.isSubmitting = false;
-          console.error('Error updating customer:', err);
-          this.showToast(err.error?.message || 'Failed to update customer', 'error');
-          this.triggerErrorAnimation();
-        }
-      });
-    }
+    const updateData = { ...formData, bankAccountNo: this.originalBankAccountNo };
+    this.customerService.update(this.customerId, updateData).subscribe({
+      next: () => {
+        this.isSubmitting = false;
+        this.showToast('Customer updated successfully', 'success');
+        setTimeout(() => this.router.navigate(['/customers']), 1500);
+      },
+      error: (err) => {
+        this.isSubmitting = false;
+        console.error('Error updating customer:', err);
+        this.showToast(err.error?.message || 'Failed to update customer', 'error');
+        this.triggerErrorAnimation();
+      }
+    });
   }
 
   isFieldInvalid(field: string): boolean {

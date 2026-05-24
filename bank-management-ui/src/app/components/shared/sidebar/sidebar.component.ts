@@ -46,10 +46,7 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
           <span class="nav-text">All Customers</span>
         </a>
 
-        <a routerLink="/customers/new" routerLinkActive="active" id="nav-add-customer" class="nav-item">
-          <span class="nav-icon">➕</span>
-          <span class="nav-text">Add Customer</span>
-        </a>
+
 
         <div class="nav-section">
           <span class="nav-section-title">BANKING</span>

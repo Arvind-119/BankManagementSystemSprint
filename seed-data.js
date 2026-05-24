@@ -85,7 +85,8 @@ async function seed() {
 
   for (const c of customers) {
     console.log(`\nRegistering customer: ${c.firstName} ${c.lastName}`);
-    const regRes = await doFetch('http://localhost:8085/api/v1/auth/register/by-manager', 'POST', c, token);
+    // Use the standard register endpoint instead of by-manager
+    const regRes = await doFetch('http://localhost:8085/api/v1/auth/register', 'POST', c);
     
     if (regRes.status !== 201) {
       console.error("Failed to register", c.firstName, regRes.body);
@@ -93,40 +94,26 @@ async function seed() {
     }
     
     const customerId = regRes.body.customerId || regRes.body.id; 
-    console.log(`Registered successfully with Customer ID: ${customerId}`);
+    const accountNo = regRes.body.accountNo;
+    console.log(`Registered successfully with Customer ID: ${customerId} and Account No: ${accountNo}`);
 
-    if (!customerId) {
-      console.log("Could not extract customer ID from response. Skipping account creation.");
+    if (!accountNo) {
+      console.log("Could not extract account No from response. Skipping deposit.");
       continue;
     }
-
-    // Create Account
-    console.log(`Creating Bank Account for ${c.firstName}...`);
-    const accRes = await doFetch('http://localhost:8083/api/v1/accounts', 'POST', {
-      customerId: customerId,
-      accountType: "SAVINGS",
-      branchName: "Main Branch",
-      ifscCode: "BANK0001234",
-      initialDeposit: 5000.00
+      
+    // Perform a sample deposit to create a transaction
+    console.log(`Making an initial deposit for ${c.firstName}...`);
+    // Note: deposit requires manager token or account owner token. Using manager token.
+    const depRes = await doFetch(`http://localhost:8083/api/v1/accounts/${accountNo}/deposit`, 'PUT', {
+      amount: 1500.00,
+      description: "Welcome bonus"
     }, token);
-
-    if (accRes.status !== 201) {
-      console.error("Failed to create account for", c.firstName, accRes.body);
+    
+    if (depRes.status === 200) {
+      console.log(`Initial deposit successful. Balance: ₹${depRes.body.balance}`);
     } else {
-      console.log(`Account created successfully! Account No: ${accRes.body.accountNo}`);
-      
-      // Perform a sample deposit to create a transaction
-      console.log(`Making an initial deposit for ${c.firstName}...`);
-      const depRes = await doFetch(`http://localhost:8083/api/v1/accounts/${accRes.body.accountNo}/deposit`, 'PUT', {
-        amount: 1500.00,
-        description: "Welcome bonus"
-      }, token);
-      
-      if (depRes.status === 200) {
-        console.log(`Initial deposit successful. Balance: ₹${depRes.body.balance}`);
-      } else {
-        console.error("Failed to make deposit", depRes.body);
-      }
+      console.error("Failed to make deposit", depRes.body);
     }
   }
   
