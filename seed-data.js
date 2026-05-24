@@ -83,6 +83,8 @@ async function seed() {
     }
   ];
 
+  const registeredAccounts = [];
+
   for (const c of customers) {
     console.log(`\nRegistering customer: ${c.firstName} ${c.lastName}`);
     // Use the standard register endpoint instead of by-manager
@@ -115,9 +117,29 @@ async function seed() {
     } else {
       console.error("Failed to make deposit", depRes.body);
     }
+
+    registeredAccounts.push({
+      name: `${c.firstName} ${c.lastName}`,
+      loginId: c.ssnId,
+      password: c.password
+    });
   }
   
   console.log("\nSeeding complete!");
+  console.log("\n==============================");
+  console.log("      LOGIN CREDENTIALS       ");
+  console.log("==============================");
+  console.log("Role: Manager");
+  console.log("  Login ID: manager1");
+  console.log("  Password: manager123");
+  console.log("------------------------------");
+  console.log("Role: Customer");
+  for (const acc of registeredAccounts) {
+    console.log(`  Name: ${acc.name}`);
+    console.log(`  Login ID: ${acc.loginId}`);
+    console.log(`  Password: ${acc.password}`);
+    console.log("------------------------------");
+  }
 }
 
 seed();
