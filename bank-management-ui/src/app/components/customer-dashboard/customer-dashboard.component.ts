@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { AccountService } from '../../services/account.service';
@@ -8,11 +8,13 @@ import { BankAccount } from '../../models/account.model';
 import { SessionUser } from '../../models/auth.model';
 import { TransactionService } from '../../services/transaction.service';
 import { Transaction } from '../../models/transaction.model';
+import { CustomerService } from '../../services/customer.service';
+import { Customer } from '../../models/customer.model';
 
 @Component({
   selector: 'app-customer-dashboard',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule],
   template: `
     <div class="cust-layout">
       <!-- Overlay -->
@@ -48,7 +50,7 @@ import { Transaction } from '../../models/transaction.model';
             <h2>My Account</h2>
           </div>
           <div class="topbar-right">
-            <div class="user-chip">
+            <div class="user-chip" (click)="showSection('profile')" style="cursor: pointer;" title="Edit Profile">
               <div class="avatar">{{ user?.name?.charAt(0) || 'C' }}</div>
               <div><span class="user-name">{{ user?.name }}</span><span class="user-role">Customer</span></div>
             </div>
@@ -180,6 +182,98 @@ import { Transaction } from '../../models/transaction.model';
               </div>
             </div>
           </div>
+
+          <!-- PROFILE SECTION -->
+          <div *ngIf="activeSection === 'profile'" class="section" id="section-profile">
+            <h2>Edit Profile</h2>
+            <p class="section-sub">Update your personal details</p>
+            <div class="op-card" style="max-width: 700px;">
+              <form [formGroup]="profileForm" (ngSubmit)="onProfileSubmit()">
+                <div class="form-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 18px;">
+                  <div class="fg">
+                    <label>SSN ID</label>
+                    <input type="text" formControlName="snnId" class="fi" readonly style="opacity: 0.7; cursor: not-allowed;" title="SSN ID cannot be changed">
+                  </div>
+                  <div class="fg">
+                    <label>Contact Number *</label>
+                    <input type="text" formControlName="contact" placeholder="10-digit mobile number" maxlength="10" class="fi">
+                    <span class="fe" *ngIf="f('contact')" style="color:#ff416c; font-size:11px;">Must be 10 digits, starting with 6-9</span>
+                  </div>
+                  <div class="fg">
+                    <label>First Name *</label>
+                    <input type="text" formControlName="firstName" class="fi">
+                    <span class="fe" *ngIf="f('firstName')" style="color:#ff416c; font-size:11px;">Required (letters only, max 50)</span>
+                  </div>
+                  <div class="fg">
+                    <label>Last Name *</label>
+                    <input type="text" formControlName="lastName" class="fi">
+                    <span class="fe" *ngIf="f('lastName')" style="color:#ff416c; font-size:11px;">Required (letters only, max 50)</span>
+                  </div>
+                  <div class="fg" style="grid-column: 1 / -1;">
+                    <label>Email *</label>
+                    <input type="email" formControlName="email" class="fi">
+                    <span class="fe" *ngIf="f('email')" style="color:#ff416c; font-size:11px;">Enter a valid email address</span>
+                  </div>
+                  <div class="fg" style="grid-column: 1 / -1;">
+                    <label>Address *</label>
+                    <input type="text" formControlName="address" class="fi" maxlength="100">
+                    <span class="fe" *ngIf="f('address')" style="color:#ff416c; font-size:11px;">Address is required (max 100 chars)</span>
+                  </div>
+                  
+                  <div class="fg">
+                    <label>New Password (Optional)</label>
+                    <input type="password" formControlName="newPassword" placeholder="Min 8 chars, upper, lower, digit, symbol" class="fi">
+                    <span class="fe" *ngIf="f('newPassword')" style="color:#ff416c; font-size:11px;">8-30 chars: uppercase, lowercase, digit, and symbol</span>
+                  </div>
+                  <div class="fg">
+                    <label>Confirm New Password</label>
+                    <input type="password" formControlName="confirmNewPassword" placeholder="Re-enter new password" class="fi">
+                    <span class="fe" *ngIf="f('confirmNewPassword') || passwordMismatch()" style="color:#ff416c; font-size:11px;">Passwords must match</span>
+                  </div>
+
+                  <div class="fg">
+                    <label>Aadhar Number</label>
+                    <input type="text" formControlName="aadharNo" placeholder="12-digit Aadhar number" maxlength="12" class="fi">
+                    <span class="fe" *ngIf="f('aadharNo')" style="color:#ff416c; font-size:11px;">Aadhar must be exactly 12 digits</span>
+                  </div>
+                  <div class="fg">
+                    <label>PAN Number</label>
+                    <input type="text" formControlName="panNo" placeholder="e.g. ABCDE1234F" maxlength="10" class="fi">
+                    <span class="fe" *ngIf="f('panNo')" style="color:#ff416c; font-size:11px;">PAN must be 10 characters</span>
+                  </div>
+                  <div class="fg">
+                    <label>Date of Birth</label>
+                    <input type="date" formControlName="dateOfBirth" class="fi">
+                  </div>
+                  <div class="fg">
+                    <label>Gender</label>
+                    <select formControlName="gender" class="fi" style="appearance: none; background-image: url('data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'12\' height=\'12\' viewBox=\'0 0 12 12\'%3E%3Cpath fill=\'%23ffffff50\' d=\'M6 8L1 3h10z\'/%3E%3C/svg%3E'); background-repeat: no-repeat; background-position: right 14px center;">
+                      <option value="" style="background:#1a1a2e">Select Gender</option>
+                      <option value="Male" style="background:#1a1a2e">Male</option>
+                      <option value="Female" style="background:#1a1a2e">Female</option>
+                      <option value="Other" style="background:#1a1a2e">Other</option>
+                    </select>
+                  </div>
+                  <div class="fg" style="grid-column: 1 / -1;">
+                    <label>Marital Status</label>
+                    <select formControlName="maritalStatus" class="fi" style="appearance: none; background-image: url('data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'12\' height=\'12\' viewBox=\'0 0 12 12\'%3E%3Cpath fill=\'%23ffffff50\' d=\'M6 8L1 3h10z\'/%3E%3C/svg%3E'); background-repeat: no-repeat; background-position: right 14px center;">
+                      <option value="" style="background:#1a1a2e">Select Status</option>
+                      <option value="Single" style="background:#1a1a2e">Single</option>
+                      <option value="Married" style="background:#1a1a2e">Married</option>
+                      <option value="Divorced" style="background:#1a1a2e">Divorced</option>
+                      <option value="Widowed" style="background:#1a1a2e">Widowed</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div style="margin-top: 24px;">
+                  <button type="submit" class="btn-action btn-primary" [disabled]="profileLoading">{{ profileLoading ? 'Updating...' : 'Update Profile' }}</button>
+                  <div class="txn-msg" *ngIf="profileMsg" [class.msg-success]="!profileError" [class.msg-error]="profileError">{{ profileMsg }}</div>
+                </div>
+              </form>
+            </div>
+          </div>
+
         </div>
       </div>
     </div>
@@ -216,7 +310,7 @@ import { Transaction } from '../../models/transaction.model';
     .btn-signout:hover { background: rgba(255,65,108,0.2); }
 
     .cust-content { flex: 1; padding: 32px; overflow-y: auto; }
-    .section { animation: fadeIn 0.3s ease; }
+    .section { animation: fadeIn 0.3s ease; max-width: 900px; margin: 0 auto; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
     .section h2 { font-size: 22px; font-weight: 700; color: #fff; margin-bottom: 4px; }
     .section-sub { color: rgba(255,255,255,0.4); font-size: 14px; margin-bottom: 20px; }
@@ -235,8 +329,8 @@ import { Transaction } from '../../models/transaction.model';
     .qa-icon { font-size: 28px; }
 
     /* Operations */
-    .live-balance { padding: 12px 16px; background: rgba(56,239,125,0.08); border: 1px solid rgba(56,239,125,0.15); border-radius: 10px; color: #38ef7d; font-size: 14px; margin-bottom: 16px; }
-    .warn-box { padding: 12px 16px; background: rgba(247,151,30,0.08); border: 1px solid rgba(247,151,30,0.15); border-radius: 10px; color: #ffd200; font-size: 13px; margin-bottom: 16px; }
+    .live-balance { padding: 12px 16px; background: rgba(56,239,125,0.08); border: 1px solid rgba(56,239,125,0.15); border-radius: 10px; color: #38ef7d; font-size: 14px; margin-bottom: 16px; max-width: 480px; }
+    .warn-box { padding: 12px 16px; background: rgba(247,151,30,0.08); border: 1px solid rgba(247,151,30,0.15); border-radius: 10px; color: #ffd200; font-size: 13px; margin-bottom: 16px; max-width: 480px; }
     .op-card { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 28px; max-width: 480px; }
     .fg { display: flex; flex-direction: column; gap: 6px; margin-bottom: 18px; }
     .fg label { font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 0.5px; }
@@ -300,10 +394,18 @@ export class CustomerDashboardComponent implements OnInit {
   txnError = false;
   opLoading = false;
 
+  profileForm!: FormGroup;
+  customerProfile: Customer | null = null;
+  profileLoading = false;
+  profileMsg = '';
+  profileError = false;
+
   constructor(
     private authService: AuthService,
     private accountService: AccountService,
     private transactionService: TransactionService,
+    private customerService: CustomerService,
+    private fb: FormBuilder,
     private router: Router
   ) { }
 
@@ -313,7 +415,26 @@ export class CustomerDashboardComponent implements OnInit {
       this.router.navigate(['/login']);
       return;
     }
+    this.initProfileForm();
     this.loadAccount();
+  }
+
+  initProfileForm(): void {
+    this.profileForm = this.fb.group({
+      snnId: [{value: '', disabled: true}],
+      contact: ['', [Validators.required, Validators.pattern(/^[6-9]\d{9}$/)]],
+      firstName: ['', [Validators.required, Validators.pattern(/^[A-Za-z\s]{1,50}$/)]],
+      lastName: ['', [Validators.required, Validators.pattern(/^[A-Za-z\s]{1,50}$/)]],
+      email: ['', [Validators.required, Validators.email]],
+      address: ['', [Validators.required, Validators.maxLength(100)]],
+      newPassword: ['', [Validators.minLength(8), Validators.maxLength(30), Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,30}$/)]],
+      confirmNewPassword: [''],
+      aadharNo: ['', [Validators.pattern(/^\d{12}$/)]],
+      panNo: ['', [Validators.pattern(/^[A-Z]{5}\d{4}[A-Z]$/)]],
+      dateOfBirth: [''],
+      gender: [''],
+      maritalStatus: ['']
+    });
   }
 
   loadAccount(): void {
@@ -347,10 +468,46 @@ export class CustomerDashboardComponent implements OnInit {
     this.transferTo = '';
     this.transferAmount = null;
     this.transferDesc = '';
+    
+    this.profileMsg = '';
+    this.profileError = false;
+    
     document.body.classList.remove('sidebar-open');
 
     // Always reload account and transactions freshly when switching tabs
     this.loadAccount();
+    
+    if (s === 'profile') {
+      this.loadProfile();
+    }
+  }
+
+  loadProfile(): void {
+    if (this.user?.linkedCustomerId) {
+      this.customerService.getById(this.user.linkedCustomerId).subscribe({
+        next: (customer) => {
+          this.customerProfile = customer;
+          this.profileForm.patchValue({
+            snnId: customer.snnId,
+            contact: customer.contact,
+            firstName: customer.firstName,
+            lastName: customer.lastName,
+            email: customer.email,
+            address: customer.address,
+            aadharNo: customer.aadharNo,
+            panNo: customer.panNo,
+            dateOfBirth: customer.dateOfBirth,
+            gender: customer.gender,
+            maritalStatus: customer.maritalStatus
+          });
+          this.profileForm.get('newPassword')?.setValue('');
+          this.profileForm.get('confirmNewPassword')?.setValue('');
+        },
+        error: () => {
+          this.showProfileMsg('Failed to load profile data', true);
+        }
+      });
+    }
   }
 
   toggleSidebar(): void {
@@ -360,8 +517,9 @@ export class CustomerDashboardComponent implements OnInit {
   doDeposit(): void {
     if (!this.depositAmount || this.depositAmount < 100) { this.showTxn('Minimum deposit amount is ₹100.', true); return; }
     this.opLoading = true;
+    const amount = this.depositAmount;
     this.accountService.deposit(this.account!.accountNo, { amount: this.depositAmount, description: 'Self deposit' }).subscribe({
-      next: (res) => { this.account = res; this.depositAmount = null; this.opLoading = false; this.loadTransactions(); this.showTxn('✅ ₹' + this.formatINR(res.balance) + ' — Deposit successful! New balance: ₹' + this.formatINR(res.balance), false); },
+      next: (res) => { this.account = res; this.depositAmount = null; this.opLoading = false; this.loadTransactions(); this.showTxn('✅ ₹' + this.formatINR(amount) + ' — Deposit successful! New balance: ₹' + this.formatINR(res.balance), false); },
       error: (err) => { this.opLoading = false; this.showTxn(err.error?.message || 'Deposit failed.', true); }
     });
   }
@@ -426,5 +584,90 @@ export class CustomerDashboardComponent implements OnInit {
   private showTxn(msg: string, err: boolean): void {
     this.txnMsg = msg;
     this.txnError = err;
+  }
+
+  f(field: string): boolean {
+    const c = this.profileForm.get(field);
+    return !!(c && c.invalid && (c.dirty || c.touched));
+  }
+
+  passwordMismatch(): boolean {
+    const pw = this.profileForm.get('newPassword')?.value;
+    const cpw = this.profileForm.get('confirmNewPassword')?.value;
+    return !!(pw && cpw && pw !== cpw);
+  }
+
+  private showProfileMsg(msg: string, err: boolean): void {
+    this.profileMsg = msg;
+    this.profileError = err;
+  }
+
+  onProfileSubmit(): void {
+    this.profileMsg = '';
+
+    if (this.profileForm.invalid) {
+      this.profileForm.markAllAsTouched();
+      this.showProfileMsg('Please fix all validation errors.', true);
+      return;
+    }
+
+    if (this.passwordMismatch()) {
+      this.showProfileMsg('Passwords do not match.', true);
+      return;
+    }
+
+    if (!this.customerProfile) return;
+
+    this.profileLoading = true;
+    const val = this.profileForm.getRawValue();
+
+    const updateReq = {
+      snnId: val.snnId, // gets from getRawValue even if disabled
+      firstName: val.firstName,
+      lastName: val.lastName,
+      email: val.email,
+      contact: val.contact,
+      address: val.address,
+      aadharNo: val.aadharNo || undefined,
+      panNo: val.panNo || undefined,
+      dateOfBirth: val.dateOfBirth || undefined,
+      gender: val.gender || undefined,
+      maritalStatus: val.maritalStatus || undefined,
+      bankAccountNo: this.customerProfile.bankAccountNo // CRITICAL: preserve account no
+    };
+
+    this.customerService.update(this.customerProfile.id, updateReq).subscribe({
+      next: () => {
+        // Handle password change if provided
+        const newPass = val.newPassword;
+        if (newPass && this.user) {
+          this.authService.updatePassword({ loginId: this.user.loginId, newPassword: newPass }).subscribe({
+            next: () => {
+              this.profileLoading = false;
+              this.showProfileMsg('Profile and password updated successfully!', false);
+              this.profileForm.get('newPassword')?.setValue('');
+              this.profileForm.get('confirmNewPassword')?.setValue('');
+            },
+            error: (err) => {
+              this.profileLoading = false;
+              this.showProfileMsg(err.error?.message || 'Profile updated, but failed to update password.', true);
+            }
+          });
+        } else {
+          this.profileLoading = false;
+          this.showProfileMsg('Profile updated successfully!', false);
+        }
+        
+        // Update user session name if changed
+        if (this.user) {
+          this.user.name = val.firstName + ' ' + val.lastName;
+          sessionStorage.setItem('bankUser', JSON.stringify(this.user));
+        }
+      },
+      error: (err) => {
+        this.profileLoading = false;
+        this.showProfileMsg(err.error?.message || 'Failed to update profile.', true);
+      }
+    });
   }
 }

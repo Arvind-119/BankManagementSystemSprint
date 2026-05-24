@@ -48,3 +48,8 @@ export interface SessionUser {
   linkedCustomerId: number;
   token: string;
 }
+
+export interface UpdatePasswordRequest {
+  loginId: string;
+  newPassword: string;
+}

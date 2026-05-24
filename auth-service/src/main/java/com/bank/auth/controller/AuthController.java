@@ -4,6 +4,7 @@ import com.bank.auth.dto.LoginRequest;
 import com.bank.auth.dto.LoginResponse;
 import com.bank.auth.dto.RegisterRequest;
 import com.bank.auth.dto.RegisterResponse;
+import com.bank.auth.dto.UpdatePasswordRequest;
 import com.bank.auth.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -56,6 +57,17 @@ public class AuthController {
             return new ResponseEntity<>(response, HttpStatus.CREATED);
         } else {
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @org.springframework.web.bind.annotation.PutMapping("/password")
+    @Operation(summary = "Update Password", description = "Update user password")
+    public ResponseEntity<String> updatePassword(@Valid @RequestBody UpdatePasswordRequest request) {
+        try {
+            authService.updatePassword(request.getLoginId(), request.getNewPassword());
+            return new ResponseEntity<>("Password updated successfully", HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 }

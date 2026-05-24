@@ -12,4 +12,6 @@ public interface AuthService {
     RegisterResponse registerCustomer(RegisterRequest request);
 
     RegisterResponse registerCustomerByManager(RegisterRequest request);
+
+    void updatePassword(String loginId, String newPassword);
 }

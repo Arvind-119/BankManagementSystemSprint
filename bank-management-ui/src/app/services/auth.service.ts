@@ -27,6 +27,10 @@ export class AuthService {
     return this.http.post<RegisterResponse>(`${this.apiUrl}/register/by-manager`, request);
   }
 
+  updatePassword(request: { loginId: string, newPassword: string }): Observable<any> {
+    return this.http.put(`${this.apiUrl}/password`, request, { responseType: 'text' });
+  }
+
   setSession(response: LoginResponse): void {
     const user: SessionUser = {
       id: response.id,

@@ -223,4 +223,14 @@ public class AuthServiceImpl implements AuthService {
         logger.info("Customer registered successfully: {} (ID: {})", response.getCustomerName(), createdCustomer.getId());
         return response;
     }
+
+    @Override
+    public void updatePassword(String loginId, String newPassword) {
+        UserCredential credential = credentialRepository.findByLoginIdAndRole(loginId, "customer")
+                .orElseThrow(() -> new RuntimeException("User not found with login ID: " + loginId));
+        
+        credential.setPassword(passwordEncoder.encode(newPassword));
+        credentialRepository.save(credential);
+        logger.info("Password updated successfully for user: {}", loginId);
+    }
 }
