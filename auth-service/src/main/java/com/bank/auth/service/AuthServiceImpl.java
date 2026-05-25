@@ -170,8 +170,8 @@ public class AuthServiceImpl implements AuthService {
             updateReq.setEmail(request.getEmail());
             updateReq.setContact(request.getContact());
             updateReq.setAddress(request.getAddress());
-            updateReq.setAadharNo(request.getAadharNo());
-            updateReq.setPanNo(request.getPanNo());
+            updateReq.setAadharNo((request.getAadharNo() == null || request.getAadharNo().trim().isEmpty()) ? null : request.getAadharNo());
+            updateReq.setPanNo((request.getPanNo() == null || request.getPanNo().trim().isEmpty()) ? null : request.getPanNo());
             updateReq.setDateOfBirth(request.getDateOfBirth());
             updateReq.setGender(request.getGender());
             updateReq.setMaritalStatus(request.getMaritalStatus());
