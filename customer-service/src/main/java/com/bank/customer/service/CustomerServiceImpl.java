@@ -76,6 +76,26 @@ public class CustomerServiceImpl implements CustomerService {
         Customer existingCustomer = customerRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Customer not found with id: " + id));
 
+        customerRepository.findBySnnId(request.getSnnId()).ifPresent(c -> {
+            if (!c.getId().equals(id)) throw new IllegalArgumentException("A customer with this SSN ID already exists.");
+        });
+
+        customerRepository.findByEmail(request.getEmail()).ifPresent(c -> {
+            if (!c.getId().equals(id)) throw new IllegalArgumentException("A customer with this email already exists.");
+        });
+
+        if (request.getPanNo() != null && !request.getPanNo().trim().isEmpty()) {
+            customerRepository.findByPanNo(request.getPanNo()).ifPresent(c -> {
+                if (!c.getId().equals(id)) throw new IllegalArgumentException("A customer with this PAN already exists.");
+            });
+        }
+
+        if (request.getAadharNo() != null && !request.getAadharNo().trim().isEmpty()) {
+            customerRepository.findByAadharNo(request.getAadharNo()).ifPresent(c -> {
+                if (!c.getId().equals(id)) throw new IllegalArgumentException("A customer with this Aadhar already exists.");
+            });
+        }
+
         existingCustomer.setSnnId(request.getSnnId());
         existingCustomer.setFirstName(request.getFirstName());
         existingCustomer.setLastName(request.getLastName());

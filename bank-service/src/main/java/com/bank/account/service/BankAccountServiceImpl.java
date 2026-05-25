@@ -185,6 +185,14 @@ public class BankAccountServiceImpl implements BankAccountService {
 
     @Override
     public AccountResponseDTO transfer(TransferDTO request) {
+        if (request.getAmount() == null || request.getAmount().compareTo(BigDecimal.ZERO) <= 0) {
+            throw new IllegalArgumentException("Transfer amount must be greater than zero.");
+        }
+
+        if (request.getFromAccountNo().equals(request.getToAccountNo())) {
+            throw new IllegalArgumentException("Cannot transfer money to the same account.");
+        }
+
         BankAccount fromAccount = bankAccountRepository.findByAccountNo(request.getFromAccountNo())
                 .orElseThrow(() -> new ResourceNotFoundException("Source account not found: " + request.getFromAccountNo()));
 
@@ -195,8 +203,13 @@ public class BankAccountServiceImpl implements BankAccountService {
             throw new InsufficientBalanceException("Insufficient balance in source account. Current balance: " + fromAccount.getBalance());
         }
 
+        BigDecimal balanceAfter = fromAccount.getBalance().subtract(request.getAmount());
+        if (com.bank.account.entity.AccountType.SAVINGS.equals(fromAccount.getAccountType()) && balanceAfter.compareTo(new BigDecimal("500")) < 0) {
+            throw new InsufficientBalanceException("Cannot transfer. Savings accounts must maintain a minimum balance of ₹500. Available for transfer: ₹" + fromAccount.getBalance().subtract(new BigDecimal("500")));
+        }
+
         // Perform transfer
-        fromAccount.setBalance(fromAccount.getBalance().subtract(request.getAmount()));
+        fromAccount.setBalance(balanceAfter);
         toAccount.setBalance(toAccount.getBalance().add(request.getAmount()));
 
         bankAccountRepository.save(fromAccount);

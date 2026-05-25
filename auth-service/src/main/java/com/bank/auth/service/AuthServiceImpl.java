@@ -184,13 +184,28 @@ public class AuthServiceImpl implements AuthService {
         } catch (Exception ex) {
             logger.error("Failed to create bank account for customer {}: {}", createdCustomer.getId(), ex.getMessage());
             
-            // Compensating transaction: Delete the partially created customer
-            try {
-                logger.info("Initiating compensation: Deleting customer {} from customer-service", createdCustomer.getId());
-                customerClient.deleteCustomer(createdCustomer.getId());
-                logger.info("Compensation successful");
-            } catch (Exception compEx) {
-                logger.error("Failed compensation: Could not delete customer {}: {}", createdCustomer.getId(), compEx.getMessage());
+            // Compensating transaction: Delete the partially created customer with retry logic
+            int retries = 3;
+            while (retries > 0) {
+                try {
+                    logger.info("Initiating compensation: Deleting customer {} from customer-service. Attempt: {}", createdCustomer.getId(), 4 - retries);
+                    customerClient.deleteCustomer(createdCustomer.getId());
+                    logger.info("Compensation successful");
+                    break;
+                } catch (Exception compEx) {
+                    retries--;
+                    logger.error("Failed compensation attempt: Could not delete customer {}: {}", createdCustomer.getId(), compEx.getMessage());
+                    if (retries > 0) {
+                        try {
+                            Thread.sleep(2000); // 2-second backoff
+                        } catch (InterruptedException ie) {
+                            Thread.currentThread().interrupt();
+                            break;
+                        }
+                    } else {
+                        logger.error("All compensation attempts failed for customer {}. Manual intervention required.", createdCustomer.getId());
+                    }
+                }
             }
 
             response.setSuccess(false);
